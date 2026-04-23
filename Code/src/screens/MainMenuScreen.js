@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { Text, Button, Title, Card, List } from "react-native-paper";
+import { Text, Button, Title, Card, List, Dialog, Portal } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth, db } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
@@ -16,6 +17,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function MainMenuScreen({ route, navigation }) {
+  const insets = useSafeAreaInsets();
+  
   const [userData, setUserData] = useState({
     username:
       route.params?.playerName ||
@@ -23,6 +26,9 @@ export default function MainMenuScreen({ route, navigation }) {
     score: route.params?.score || 0,
     photoURL: null,
   });
+
+  const [showModeDialog, setShowModeDialog] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -120,15 +126,24 @@ export default function MainMenuScreen({ route, navigation }) {
 
   const handleSelectLevel = (level) => {
     if (level.unlocked) {
-      navigation.navigate("Gameplay", {
-        levelId: level.id,
-        levelTitle: level.title,
-      });
+      setSelectedLevel(level);
+      setShowModeDialog(true);
     } else {
       Alert.alert(
         "Terkunci 🔒",
         `Kumpulkan skor setidaknya ${level.requiredScore} Pts untuk membuka area ini! (Skor saat ini: ${userData.score})`,
       );
+    }
+  };
+
+  const startGame = (mode) => {
+    setShowModeDialog(false);
+    if (selectedLevel) {
+      navigation.navigate("Gameplay", {
+        levelId: selectedLevel.id,
+        levelTitle: selectedLevel.title,
+        gameMode: mode,
+      });
     }
   };
 
@@ -162,7 +177,7 @@ export default function MainMenuScreen({ route, navigation }) {
   );
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
+    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}>
       <Card style={styles.profileCard}>
         <Card.Content style={styles.profileContent}>
           <TouchableOpacity
@@ -234,19 +249,53 @@ export default function MainMenuScreen({ route, navigation }) {
           Lihat Papan Peringkat
         </Button>
       </View>
+
+      {/* Mode Selection Dialog */}
+      <Portal>
+        <Dialog visible={showModeDialog} onDismiss={() => setShowModeDialog(false)} style={styles.dialogStyle}>
+          <Dialog.Title style={styles.dialogTitle}>Pilih Mode Permainan</Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.dialogSub}>Tentukan tingkat kesulitanmu untuk {selectedLevel?.title}:</Text>
+            
+            <TouchableOpacity activeOpacity={0.8} style={styles.modeCard} onPress={() => startGame("sudden_death")}>
+              <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.modeGradient}>
+                <MaterialCommunityIcons name="skull" size={28} color="#FFF" />
+                <View style={styles.modeTextWrap}>
+                  <Text style={styles.modeTitle}>Sudden Death</Text>
+                  <Text style={styles.modeDesc}>1 Kali Salah / Waktu Habis = Kalah</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity activeOpacity={0.8} style={styles.modeCard} onPress={() => startGame("lives")}>
+              <LinearGradient colors={["#11998e", "#38ef7d"]} style={styles.modeGradient}>
+                <MaterialCommunityIcons name="cards-heart" size={28} color="#FFF" />
+                <View style={styles.modeTextWrap}>
+                  <Text style={styles.modeTitle}>Mode Nyawa (3 ❤️)</Text>
+                  <Text style={styles.modeDesc}>Punya 3 kesempatan sebelum Game Over</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setShowModeDialog(false)} textColor="#666">Batal</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
     </LinearGradient>
   );
 }
 
-const windowWidth = Dimensions.get("window").width;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
   },
   profileCard: {
-    marginHorizontal: 20,
+    marginHorizontal: "5%",
+    maxWidth: 600,
+    alignSelf: "center",
+    width: "90%",
     backgroundColor: "rgba(255,255,255,0.95)",
     borderRadius: 20,
     marginBottom: 15,
@@ -313,7 +362,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 15,
-    paddingHorizontal: 15,
+    paddingHorizontal: "5%",
+    maxWidth: 800,
+    width: "100%",
+    alignSelf: "center",
   },
   sectionTitle: {
     color: "#FFD700",
@@ -384,5 +436,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#26D0CE",
+  },
+  dialogStyle: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+  },
+  dialogTitle: {
+    textAlign: "center",
+    fontWeight: "900",
+    color: "#1A2980",
+  },
+  dialogSub: {
+    textAlign: "center",
+    marginBottom: 15,
+    color: "#555",
+  },
+  modeCard: {
+    marginBottom: 12,
+    borderRadius: 15,
+    overflow: "hidden",
+    elevation: 4,
+  },
+  modeGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+  },
+  modeTextWrap: {
+    marginLeft: 15,
+    flex: 1,
+  },
+  modeTitle: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  modeDesc: {
+    color: "#eee",
+    fontSize: 12,
+    marginTop: 2,
   },
 });

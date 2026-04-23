@@ -14,15 +14,17 @@ import {
   Text,
   ActivityIndicator,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { generateMathProblem } from "../utils/mathGenerator";
 import GameOverModal from "../components/GameOverModal";
 import { db, auth } from "../firebaseConfig";
 import { doc, getDoc, setDoc, collection, addDoc } from "firebase/firestore";
 
-const windowWidth = Dimensions.get("window").width;
-
 export default function GameplayScreen({ route, navigation }) {
+  const insets = useSafeAreaInsets();
+
   // Pastikan levelId selalu string
   const levelId = String(
     route.params && route.params.levelId ? route.params.levelId : "1",
@@ -32,16 +34,20 @@ export default function GameplayScreen({ route, navigation }) {
       ? route.params.levelTitle
       : "Level 1";
 
+  const gameMode = route.params?.gameMode || "sudden_death";
+
   // MAX_TIME stabil, tidak berubah setiap render
   const MAX_TIME = useMemo(() => 10 + parseInt(levelId, 10) * 5, [levelId]);
+  const INITIAL_LIVES = 3;
 
   const [currentQ, setCurrentQ] = useState(null);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(MAX_TIME);
   const [combo, setCombo] = useState(0);
+  const [lives, setLives] = useState(gameMode === "lives" ? INITIAL_LIVES : null);
   const [gameOver, setGameOver] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
-  const [gameOverReason, setGameOverReason] = useState(null); // 'time-up' atau 'wrong-answer'
+  const [gameOverReason, setGameOverReason] = useState(null); // 'time-up', 'wrong-answer', atau 'out-of-lives'
 
   // Gunakan ref agar endGame selalu baca nilai score terbaru tanpa dependency masalah
   const scoreRef = useRef(score);
@@ -112,14 +118,18 @@ export default function GameplayScreen({ route, navigation }) {
 
   // ─── Game Over ────────────────────────────────────────────────────────────────
   const endGame = useCallback(
-    async (finalScore, isTimeOut = false) => {
+    async (finalScore, isTimeOut = false, isOutOfLives = false) => {
       if (gameOverRef.current) return; // jangan panggil dua kali
       setGameOver(true);
       await saveScore(finalScore);
-      setGameOverReason(isTimeOut ? "time-up" : "wrong-answer");
+      let reason = isTimeOut ? "time-up" : "wrong-answer";
+      if (gameMode === "lives" && isOutOfLives) {
+        reason = "out-of-lives";
+      }
+      setGameOverReason(reason);
       setShowGameOverModal(true);
     },
-    [saveScore],
+    [saveScore, gameMode],
   );
 
   // ─── Timer countdown ──────────────────────────────────────────────────────────
@@ -127,7 +137,20 @@ export default function GameplayScreen({ route, navigation }) {
     if (!currentQ || gameOver) return;
 
     if (timeLeft <= 0) {
-      endGame(scoreRef.current, true);
+      if (gameMode === "lives") {
+        setLives((prev) => {
+          const newLives = prev - 1;
+          if (newLives <= 0) {
+            endGame(scoreRef.current, true, true);
+          } else {
+            setCombo(0);
+            loadQuestion();
+          }
+          return newLives;
+        });
+      } else {
+        endGame(scoreRef.current, true);
+      }
       return;
     }
 
@@ -136,7 +159,7 @@ export default function GameplayScreen({ route, navigation }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, currentQ, gameOver, endGame]);
+  }, [timeLeft, currentQ, gameOver, endGame, gameMode, loadQuestion]);
 
   // ─── Handle jawaban ───────────────────────────────────────────────────────────
   const handleAnswer = useCallback(
@@ -153,10 +176,23 @@ export default function GameplayScreen({ route, navigation }) {
         setCombo(newCombo);
         loadQuestion();
       } else {
-        endGame(scoreRef.current, false);
+        if (gameMode === "lives") {
+           setLives((prev) => {
+             const newLives = prev - 1;
+             if (newLives <= 0) {
+               endGame(scoreRef.current, false, true);
+             } else {
+               setCombo(0);
+               loadQuestion();
+             }
+             return newLives;
+           });
+        } else {
+          endGame(scoreRef.current, false);
+        }
       }
     },
-    [currentQ, combo, timeLeft, loadQuestion, endGame],
+    [currentQ, combo, timeLeft, loadQuestion, endGame, gameMode],
   );
 
   // ─── Handle Retry ─────────────────────────────────────────────────────────────
@@ -167,9 +203,10 @@ export default function GameplayScreen({ route, navigation }) {
     setScore(0);
     setCombo(0);
     setTimeLeft(MAX_TIME);
+    if (gameMode === "lives") setLives(INITIAL_LIVES);
     gameOverRef.current = false;
     loadQuestion();
-  }, [MAX_TIME, loadQuestion]);
+  }, [MAX_TIME, loadQuestion, gameMode]);
 
   // ─── Handle Back to Menu ──────────────────────────────────────────────────────
   const handleBackToMenu = useCallback(() => {
@@ -182,7 +219,7 @@ export default function GameplayScreen({ route, navigation }) {
     return (
       <LinearGradient
         colors={["#0F2027", "#203A43", "#2C5364"]}
-        style={styles.container}
+        style={[styles.container, { paddingTop: Math.max(insets.top + 10, 30) }]}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#FFD700" />
@@ -200,18 +237,27 @@ export default function GameplayScreen({ route, navigation }) {
     <>
       <LinearGradient
         colors={["#0F2027", "#203A43", "#2C5364"]}
-        style={styles.container}
+        style={[styles.container, { paddingTop: Math.max(insets.top + 10, 30), paddingBottom: Math.max(insets.bottom, 10) }]}
       >
         {/* Top Bar */}
         <View style={styles.topBar}>
           <View style={styles.statsBox}>
             <Text style={styles.scoreText}>SKOR: {score}</Text>
+            {gameMode === "lives" && lives !== null && (
+              <View style={{flexDirection: 'row', marginTop: 4}}>
+                {Array.from({ length: Math.max(0, lives) }).map((_, i) => (
+                  <MaterialCommunityIcons key={i} name="heart" size={16} color="#FF3D00" style={{marginRight: 2}} />
+                ))}
+              </View>
+            )}
             {combo > 1 && (
               <Text style={styles.comboText}>🔥 COMBO x{combo} 🔥</Text>
             )}
           </View>
           <View style={styles.suddenDeathBadge}>
-            <Text style={styles.suddenDeathText}>☠️ SUDDEN DEATH</Text>
+            <Text style={styles.suddenDeathText}>
+              {gameMode === "lives" ? "❤️ MODE NYAWA" : "☠️ SUDDEN DEATH"}
+            </Text>
           </View>
         </View>
 
@@ -285,8 +331,7 @@ export default function GameplayScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    paddingTop: 30,
+    paddingHorizontal: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -395,7 +440,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   optionButton: {
-    width: (windowWidth - 50) / 2,
+    width: "48%", // Responsif terhadap berbagai ukuran layar
     marginBottom: 15,
     borderRadius: 20,
     elevation: 8,

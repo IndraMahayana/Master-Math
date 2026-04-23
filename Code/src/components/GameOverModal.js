@@ -20,10 +20,11 @@ export default function GameOverModal({
   onBackToMenu,
 }) {
   const isTimeUp = reason === "time-up";
-  const title = isTimeUp ? "⏰ WAKTU HABIS!" : "❌ JAWABAN SALAH!";
-  const message = isTimeUp
-    ? "Waktu bermain kamu habis!"
-    : "Jawaban kamu salah!";
+  const isOutOfLives = reason === "out-of-lives";
+  const title = isOutOfLives ? "💔 NYAWA HABIS!" : (isTimeUp ? "⏰ WAKTU HABIS!" : "❌ JAWABAN SALAH!");
+  const message = isOutOfLives
+    ? "Kamu telah kehilangan seluruh nyawa!"
+    : (isTimeUp ? "Waktu bermain kamu habis!" : "Jawaban kamu salah!");
 
   return (
     <Modal
