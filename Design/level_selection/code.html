@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Math Master - Level Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-headline {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-dim": "#3d469f",
+                        "surface-container": "#e7e8ea",
+                        "on-primary-fixed": "#000005",
+                        "primary": "#4953ac",
+                        "on-secondary-fixed-variant": "#005965",
+                        "on-secondary-container": "#004f5a",
+                        "on-primary": "#f3f1ff",
+                        "surface-bright": "#f6f6f8",
+                        "background": "#f6f6f8",
+                        "on-primary-fixed-variant": "#18217d",
+                        "surface-variant": "#dbdde0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#003a43",
+                        "primary-fixed-dim": "#858eec",
+                        "on-secondary": "#daf8ff",
+                        "primary-fixed": "#929bfa",
+                        "secondary-fixed": "#54e3fc",
+                        "error-container": "#f74b6d",
+                        "surface": "#f6f6f8",
+                        "secondary-fixed-dim": "#40d5ee",
+                        "inverse-primary": "#929bfa",
+                        "tertiary-dim": "#005d16",
+                        "error": "#b41340",
+                        "surface-dim": "#d2d4d8",
+                        "tertiary-container": "#91f78e",
+                        "on-tertiary-container": "#005e17",
+                        "surface-container-high": "#e1e2e5",
+                        "inverse-surface": "#0c0e10",
+                        "on-error": "#ffefef",
+                        "secondary": "#006573",
+                        "surface-container-low": "#f0f1f3",
+                        "error-dim": "#a70138",
+                        "secondary-container": "#54e3fc",
+                        "on-tertiary": "#d1ffc8",
+                        "on-tertiary-fixed-variant": "#00691a",
+                        "surface-tint": "#4953ac",
+                        "on-primary-container": "#0b1574",
+                        "tertiary-fixed": "#91f78e",
+                        "tertiary-fixed-dim": "#83e881",
+                        "on-error-container": "#510017",
+                        "on-surface-variant": "#5a5c5d",
+                        "surface-container-highest": "#dbdde0",
+                        "primary-container": "#929bfa",
+                        "on-surface": "#2d2f31",
+                        "tertiary": "#006b1b",
+                        "outline-variant": "#acadaf",
+                        "outline": "#757779",
+                        "on-tertiary-fixed": "#00480f",
+                        "inverse-on-surface": "#9c9d9f",
+                        "secondary-dim": "#005864",
+                        "on-background": "#2d2f31"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-indigo-700 dark:text-indigo-400 hover:opacity-80 transition-opacity active:scale-95 duration-200 cursor-pointer" data-icon="menu">menu</span>
+<h1 class="font-headline font-extrabold text-xl tracking-tight text-indigo-900 dark:text-indigo-100">Math Master</h1>
+</div>
+<div class="bg-indigo-50 dark:bg-indigo-950 px-4 py-1.5 rounded-full">
+<span class="font-headline font-bold text-indigo-700 dark:text-indigo-400">1250 pts</span>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<section class="mb-10">
+<p class="text-on-surface-variant font-medium tracking-wide mb-2">CURRICULUM</p>
+<h2 class="font-headline text-3xl font-extrabold text-on-surface leading-tight">Master the Fundamentals</h2>
+</section>
+<div class="grid grid-cols-1 gap-6">
+<div class="group relative bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(73,83,172,0.08)] overflow-hidden border-2 border-primary-container/30">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="relative flex items-center justify-between">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold uppercase tracking-widest text-primary">Level 01</span>
+<span class="flex h-2 w-2 rounded-full bg-tertiary"></span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-indigo-950 mb-4">Basic Limits</h3>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="profile avatar of a young smiling person with glasses and short dark hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDekiLz0MsNwM2AEVVYM3VrUUTTlU_xfmTMVHgEv-MMkEcQSpLnJooA0SlcTwmckzbe86lggQf8vhIUdnCEPS1Pgw5mDHCaA09lwr62ZlKBjPkoIWk0yO4cSKhQrPSkuJQ9ouaMcSK9BkXZpCo07q2aXfk2NoFWHhP6kJvBEILJKhgKx0-QSWwOMZIRUSSmnxKCBksQVa8Ow8BGOwuv1ZDcuIWkvmXUPygtxEUdVuJoZ8PAOsGRrJfFUdr4_XltAa__F2sNIzcWfoc"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-primary text-[10px] text-white font-bold flex items-center justify-center">
+                                    +42
+                                </div>
+</div>
+<span class="text-xs font-medium text-on-surface-variant">Active Learners</span>
+</div>
+</div>
+<div class="bg-primary/10 p-5 rounded-lg">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="calculate" style="font-variation-settings: 'FILL' 1;">calculate</span>
+</div>
+</div>
+<div class="mt-8 flex items-center justify-between bg-surface-container-low rounded-full px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="text-sm font-semibold text-on-surface">3/3 Stars Earned</span>
+</div>
+<button class="bg-primary hover:bg-primary-dim text-white font-headline font-bold px-6 py-2 rounded-full shadow-md active:scale-95 transition-all">
+                        PLAY
+                    </button>
+</div>
+</div>
+<div class="relative bg-surface-container-low/60 rounded-xl p-6 overflow-hidden">
+<div class="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center px-8">
+<div class="bg-white p-4 rounded-full shadow-lg mb-4">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<p class="font-headline font-bold text-on-surface mb-1">Requirements Not Met</p>
+<p class="text-xs text-on-surface-variant font-medium">Complete 'Basic Limits' with 80% accuracy to unlock</p>
+</div>
+<div class="relative flex items-center justify-between opacity-40">
+<div class="flex-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1 block">Level 02</span>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-4">Algebra &amp; Variables</h3>
+</div>
+<div class="bg-surface-container-high p-5 rounded-lg">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant" data-icon="function">function</span>
+</div>
+</div>
+<div class="mt-8 flex items-center justify-between bg-surface-container-high/50 rounded-full px-6 py-4 opacity-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="stars">stars</span>
+<span class="text-sm font-semibold text-on-surface">Locked</span>
+</div>
+<div class="h-10 w-24 bg-surface-variant rounded-full"></div>
+</div>
+</div>
+<div class="relative bg-surface-container-low/60 rounded-xl p-6 overflow-hidden">
+<div class="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant/40 text-4xl" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="relative flex items-center justify-between opacity-30">
+<div class="flex-1">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1 block">Level 03</span>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-4">Specific Equations</h3>
+</div>
+<div class="bg-surface-container-high p-5 rounded-lg">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant" data-icon="data_object">data_object</span>
+</div>
+</div>
+<div class="mt-8 h-14 bg-surface-container-high/50 rounded-full w-full opacity-30"></div>
+</div>
+</div>
+<section class="mt-12 p-8 bg-primary rounded-xl relative overflow-hidden text-on-primary">
+<div class="absolute top-0 left-0 w-full h-full opacity-10" data-alt="subtle geometric cube pattern on a deep blue background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDT7LerGE0xweLZG8dtZvqr9KzIm5DvxYlBrZ9ZsrypL21RdHY-MmKGiKpce0E8Uw27AdvY2B5lmHLubJHzgGMzmulTlrrzAI235N7QkmHjdngW3UpJscuZA5xLP47tbzTUxBIqs1jIIz0ZDLLtE5XkcUWcHQdfRU1xaL9GMSTE0ZNCI6uq3HjVzGeSxoOxKrCLxN4aoinRWmXu51DiUypCJPMAk6YL-cdKif1VqX5RAjE4WKtpeyqCWmnh7uCXGeQwENbx8m_HLts');"></div>
+<div class="relative z-20">
+<h4 class="font-headline text-2xl font-bold mb-2">Bonus Challenge</h4>
+<p class="text-on-primary/80 mb-6 text-sm leading-relaxed">Solve 5 quick puzzles in 60 seconds to earn a multiplier boost.</p>
+<button class="bg-white text-primary font-headline font-extrabold px-8 py-3 rounded-full shadow-xl hover:shadow-2xl transition-all active:scale-95">
+                    START SPRINT
+                </button>
+</div>
+<div class="absolute -bottom-6 -right-6 opacity-20">
+<span class="material-symbols-outlined text-[120px]" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl shadow-[0_-8px_30px_rgb(0,0,0,0.06)] rounded-t-[3rem] z-50">
+<div class="flex flex-col items-center justify-center bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-cyan-300 rounded-3xl px-6 py-2 active:scale-90 transition-transform duration-300 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-['Inter'] text-xs font-semibold">Menu</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-6 py-2 hover:text-indigo-500 dark:hover:text-cyan-300 active:scale-90 transition-transform duration-300 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="leaderboard">leaderboard</span>
+<span class="font-['Inter'] text-xs font-semibold">Leaderboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-6 py-2 hover:text-indigo-500 dark:hover:text-cyan-300 active:scale-90 transition-transform duration-300 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Inter'] text-xs font-semibold">Profile</span>
+</div>
+</nav>
+</body></html>

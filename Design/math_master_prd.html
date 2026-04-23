@@ -1,0 +1,51 @@
+# Dokumen Desain: Math Master Mobile Game
+## 1. Tech Stack Overview
+* **Frontend:** React Native (menggunakan Expo)
+* **Database & Auth:** Firebase (Authentication, Cloud Firestore)
+* **UI/UX Guidelines:** Material Design / Custom UI
+---
+## 2. Struktur Database (Firebase Firestore)
+### Collection: `users`
+* `uid` (String) - Firebase Auth UID
+* `displayName` (String)
+* `currentLevel` (Number) - Menyimpan progres level maksimal yang dicapai
+* `totalScore` (Number) - Untuk kalkulasi Leaderboard
+### Collection: `questions` (Atau bisa di-hardcode di state jika statis)
+* `level` (Number)
+* `questionText` (String) - Contoh: "Berapa limit x -> 0 dari..."
+* `options` (Array of Strings) - 4 pilihan ganda
+* `correctAnswer` (String/Index)
+---
+## 3. UI/UX Wireframe & Screen Flow
+### Screen 1: Login / Sign Up
+**Tujuan:** Otentikasi pengguna untuk menyimpan progres.
+* **Header:** Logo Game & Judul.
+* **Input Fields:** Email, Password.
+* **Buttons:** * [ Login ]
+    * [ Sign up with Google ] (Integrasi Firebase Auth)
+    * [ Play as Guest ] (Opsi jika ingin main tanpa simpan skor)
+### Screen 2: Main Menu
+**Tujuan:** Navigasi utama setelah login berhasil.
+* **Header:** "Halo, [Nama Player]! | Skor: 1500"
+* **Buttons:**
+    * [ Mulai Bermain ] -> Arahkan ke Level Selection
+    * [ Leaderboard ] -> Arahkan ke Screen Leaderboard
+    * [ Pengaturan ]
+### Screen 3: Level Selection
+**Tujuan:** Memilih tingkat kesulitan atau topik matematika.
+* **Grid Layout (Locked & Unlocked status):**
+    * [ Level 1: Limit Dasar ] (Terbuka)
+    * [ Level 2: Aljabar & Variabel (x=...) ] (Terkunci, butuh skor X)
+    * [ Level 3: Persamaan Spesifik ] (Terkunci)
+### Screen 4: Gameplay (Core Loop)
+**Tujuan:** Menampilkan soal dan menangani logika jawaban.
+* **Top Bar:** Timer (opsional, misal 30 detik), Indikator Level, dan Skor Saat Ini.
+* **Center Area:** Teks Soal Matematika. (Gunakan *library* seperti `react-native-math-view` jika butuh render rumus kompleks).
+* **Bottom Area (2x2 Grid untuk 4 Opsi):**
+    * [ Opsi A ]  |  [ Opsi B ]
+    * [ Opsi C ]  |  [ Opsi D ]
+* **Feedback Logic:** Jika benar, tombol hijau + tambah skor. Jika salah, tombol merah + kurangi *nyawa* atau langsung ke soal berikutnya.
+### Screen 5: Leaderboard
+**Tujuan:** Memunculkan jiwa kompetitif pemain.
+* **List View (Top 10 / 50):** * Diurutkan berdasarkan `totalScore` secara *descending*.
+    * Highlight baris yang berisi nama pemain saat ini (Current User).
