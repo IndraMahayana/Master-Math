@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
 import { List, Title, Card, Text } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function LeaderboardScreen({ route, navigation }) {
+export default function ChallengeLeaderboardScreen({ route, navigation }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Fallback Dummy Data
-  const defaultLeaderboard = [
-    { id: "dummy-1", playerName: "MathGenius", totalScore: 3000 },
-    { id: "dummy-2", playerName: "AlgebraKing", totalScore: 2500 },
-    { id: "dummy-3", playerName: "LimitMaster", totalScore: 2100 },
-  ];
+  const [mode, setMode] = useState("daily"); // "daily" or "weekly"
 
   const currentUserEmail = auth.currentUser
     ? auth.currentUser.email
@@ -24,42 +18,39 @@ export default function LeaderboardScreen({ route, navigation }) {
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      setLoading(true);
       try {
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, orderBy("score", "desc"), limit(10));
+        const leaderboardsRef = collection(db, `challenge_leaderboards/${mode}/users`);
+        const q = query(leaderboardsRef, orderBy("score", "desc"), limit(20));
         const querySnapshot = await getDocs(q);
 
         let data = [];
         querySnapshot.forEach((doc) => {
           data.push({
             id: doc.id,
-            playerName: doc.data().username || doc.data().email.split("@")[0],
-            totalScore: doc.data().score || 0,
+            playerName: doc.data().username || "Unknown",
+            score: doc.data().score || 0,
+            streak: doc.data().streak || 0,
           });
         });
 
-        if (data.length === 0) {
-          setLeaderboard(defaultLeaderboard);
-        } else {
-          setLeaderboard(data);
-        }
+        setLeaderboard(data);
       } catch (error) {
-        console.log("Error fetching leaderboard: ", error);
-        setLeaderboard(defaultLeaderboard);
+        console.log("Error fetching challenge leaderboard: ", error);
+        setLeaderboard([]);
       } finally {
         setLoading(false);
       }
     };
 
     const unsubscribe = navigation.addListener("focus", () => {
-      setLoading(true);
       fetchLeaderboard();
     });
 
     fetchLeaderboard();
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, mode]);
 
   const renderItem = ({ item, index }) => {
     const isCurrentUser = item.playerName === currentUser;
@@ -69,13 +60,13 @@ export default function LeaderboardScreen({ route, navigation }) {
           title={`${index + 1}. ${item.playerName}`}
           subtitle={
             <Text style={styles.scoreText}>
-              Skor: <Text style={styles.scoreNumber}>{item.totalScore}</Text>
+              Skor: <Text style={styles.scoreNumber}>{item.score}</Text>  |  Max Streak: {item.streak}
             </Text>
           }
           left={(props) => (
             <List.Icon
               {...props}
-              icon="trophy"
+              icon="medal"
               color={
                 index === 0
                   ? "#FFD700"
@@ -98,7 +89,22 @@ export default function LeaderboardScreen({ route, navigation }) {
 
   return (
     <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
-      <Title style={styles.title}>🏆 Top 10 Pemain 🏆</Title>
+      <Title style={styles.title}>🏆 Leaderboard Tantangan 🏆</Title>
+
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, mode === "daily" && styles.activeTab]}
+          onPress={() => setMode("daily")}
+        >
+          <Text style={[styles.tabText, mode === "daily" && styles.activeTabText]}>Harian</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, mode === "weekly" && styles.activeTab]}
+          onPress={() => setMode("weekly")}
+        >
+          <Text style={[styles.tabText, mode === "weekly" && styles.activeTabText]}>Mingguan</Text>
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
         <ActivityIndicator
@@ -108,13 +114,17 @@ export default function LeaderboardScreen({ route, navigation }) {
         />
       ) : (
         <View style={styles.listWrapper}>
-          <FlatList
-            data={leaderboard}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={styles.listContainer}
-            showsVerticalScrollIndicator={false}
-          />
+          {leaderboard.length === 0 ? (
+             <Text style={styles.emptyText}>Belum ada data di papan peringkat ini.</Text>
+          ) : (
+            <FlatList
+              data={leaderboard}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContainer}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
         </View>
       )}
     </LinearGradient>
@@ -129,12 +139,36 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     marginVertical: 15,
-    fontSize: 26,
+    fontSize: 24,
     color: "#FFD700",
     fontWeight: "900",
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 5,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginBottom: 15,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  activeTab: {
+    backgroundColor: "#FFD700",
+  },
+  tabText: {
+    color: "#FFF",
+    fontWeight: "bold",
+  },
+  activeTabText: {
+    color: "#1A2980",
   },
   listWrapper: {
     flex: 1,
@@ -172,4 +206,10 @@ const styles = StyleSheet.create({
   highlightedText: {
     color: "#00838F",
   },
+  emptyText: {
+    textAlign: "center",
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 30,
+    fontStyle: "italic",
+  }
 });

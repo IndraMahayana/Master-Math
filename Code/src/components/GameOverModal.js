@@ -15,16 +15,22 @@ export default function GameOverModal({
   visible,
   reason, // 'time-up' atau 'wrong-answer'
   score,
+  perfectBonus = 0,
+  firstClearBonus = 0,
   levelTitle,
   onRetry,
   onBackToMenu,
 }) {
   const isTimeUp = reason === "time-up";
   const isOutOfLives = reason === "out-of-lives";
-  const title = isOutOfLives ? "💔 NYAWA HABIS!" : (isTimeUp ? "⏰ WAKTU HABIS!" : "❌ JAWABAN SALAH!");
-  const message = isOutOfLives
-    ? "Kamu telah kehilangan seluruh nyawa!"
-    : (isTimeUp ? "Waktu bermain kamu habis!" : "Jawaban kamu salah!");
+  const isWin = reason === "win";
+  
+  const title = isWin ? "🎉 KAMU MENANG!" : isOutOfLives ? "💔 NYAWA HABIS!" : (isTimeUp ? "⏰ WAKTU HABIS!" : "❌ JAWABAN SALAH!");
+  const message = isWin 
+    ? "Selamat, kamu berhasil menyelesaikan seluruh soal!"
+    : isOutOfLives
+      ? "Kamu telah kehilangan seluruh nyawa!"
+      : (isTimeUp ? "Waktu bermain kamu habis!" : "Jawaban kamu salah!");
 
   return (
     <Modal
@@ -38,7 +44,7 @@ export default function GameOverModal({
         {/* Modal Card */}
         <View style={styles.modalCard}>
           {/* Title */}
-          <Text style={styles.title}>{title}</Text>
+          <Text style={[styles.title, isWin && { color: "#4CAF50" }]}>{title}</Text>
 
           {/* Message */}
           <Text style={styles.message}>{message}</Text>
@@ -53,6 +59,12 @@ export default function GameOverModal({
           <View style={styles.scoreBox}>
             <Text style={styles.scoreLabel}>Skor Akhir</Text>
             <Text style={styles.scoreValue}>{score}</Text>
+            {perfectBonus > 0 && (
+              <Text style={styles.bonusText}>✨ Perfect Bonus: +{perfectBonus}</Text>
+            )}
+            {firstClearBonus > 0 && (
+              <Text style={styles.bonusText}>🎯 First Clear Bonus: +{firstClearBonus}</Text>
+            )}
           </View>
 
           {/* Buttons Container */}
@@ -167,7 +179,13 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#fff",
+    color: "#111",
+  },
+  bonusText: {
+    fontSize: 14,
+    color: "#D97706",
+    fontWeight: "bold",
+    marginTop: 4,
   },
   buttonsContainer: {
     width: "100%",

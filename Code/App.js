@@ -14,6 +14,8 @@ import LeaderboardScreen from "./src/screens/LeaderboardScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import QuestionWarehouseScreen from "./src/screens/QuestionWarehouseScreen";
 import PracticeProblemsScreen from "./src/screens/PracticeProblemsScreen";
+import ChallengeMenuScreen from "./src/screens/ChallengeMenuScreen";
+import ChallengeLeaderboardScreen from "./src/screens/ChallengeLeaderboardScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -115,6 +117,16 @@ export default function App() {
               name="PracticeProblems"
               component={PracticeProblemsScreen}
               options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="ChallengeMenu"
+              component={ChallengeMenuScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="ChallengeLeaderboard"
+              component={ChallengeLeaderboardScreen}
+              options={{ title: "Papan Peringkat Tantangan" }}
             />
           </Stack.Navigator>
         </NavigationContainer>

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
+  SectionList,
   Alert,
   TouchableOpacity,
   Image,
@@ -21,8 +22,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth, db } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { checkPhaseUnlock, getRequiredScore } from "../systems/progressionSystem";
+import { isLevelUnlocked } from "../systems/challengeSystem";
 
 export default function MainMenuScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
@@ -33,6 +36,8 @@ export default function MainMenuScreen({ route, navigation }) {
       (auth.currentUser ? auth.currentUser.email?.split("@")[0] : "Guest"),
     score: route.params?.score || 0,
     photoURL: null,
+    completedLevels: [],
+    completedChallenges: [],
   });
 
   const [showModeDialog, setShowModeDialog] = useState(false);
@@ -44,7 +49,22 @@ export default function MainMenuScreen({ route, navigation }) {
         try {
           const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
           if (userSnap.exists()) {
-            setUserData(userSnap.data());
+            let data = userSnap.data();
+            const today = new Date().toISOString().split('T')[0];
+            const lastLogin = data.lastLoginDate;
+
+            if (lastLogin !== today) {
+              const newScore = (data.score || 0) + 1000;
+              await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                lastLoginDate: today,
+                score: newScore
+              });
+              data.score = newScore;
+              data.lastLoginDate = today;
+              Alert.alert("🎉 Bonus Login Harian!", "Kamu mendapatkan +1000 Poin untuk login hari ini!");
+            }
+
+            setUserData(data);
           }
         } catch (error) {
           console.log("Error fetching user data", error);
@@ -59,68 +79,91 @@ export default function MainMenuScreen({ route, navigation }) {
     return unsubscribe;
   }, [navigation]);
 
-  const levels = [
+  const phasesData = [
     {
-      id: "1",
-      title: "Level 1: Aritmatika Dasar (+/-)",
-      requiredScore: 0,
-      unlocked: true,
+      title: "Fase 1: Aritmatika & Dasar",
+      data: [
+        { id: "1", title: "Level 1: Penjumlahan" },
+        { id: "2", title: "Level 2: Pengurangan" },
+        { id: "3", title: "Level 3: Perkalian" },
+        { id: "4", title: "Level 4: Pembagian" },
+        { id: "5", title: "Level 5: Operasi Campuran" },
+        { id: "6", title: "Level 6: Pecahan" },
+        { id: "7", title: "Level 7: Desimal" },
+        { id: "8", title: "Level 8: Persen" },
+        { id: "9", title: "Level 9: Rasio & Proporsi" },
+        { id: "10", title: "Level 10: Perbandingan" },
+        { id: "11", title: "Level 11: Pembulatan" },
+        { id: "12", title: "Level 12: Estimasi Cepat" },
+        { id: "13", title: "Level 13: Faktor & Kelipatan" },
+        { id: "14", title: "Level 14: FPB & KPK" },
+        { id: "15", title: "Level 15: Bilangan Negatif" },
+      ]
     },
     {
-      id: "2",
-      title: "Level 2: Perkalian & Pembagian",
-      requiredScore: 50,
-      unlocked: userData.score >= 50,
+      title: "Fase 2: Aljabar",
+      data: [
+        { id: "16", title: "Level 16: Variabel" },
+        { id: "17", title: "Level 17: Persamaan Linear" },
+        { id: "18", title: "Level 18: Pertidaksamaan" },
+        { id: "19", title: "Level 19: Sistem Persamaan" },
+        { id: "20", title: "Level 20: Aljabar Ekspresi" },
+        { id: "21", title: "Level 21: Faktorisasi" },
+        { id: "22", title: "Level 22: Kuadrat" },
+        { id: "23", title: "Level 23: Fungsi" },
+        { id: "24", title: "Level 24: Fungsi Linear" },
+        { id: "25", title: "Level 25: Fungsi Kuadrat" },
+        { id: "26", title: "Level 26: Polinomial" },
+        { id: "27", title: "Level 27: Substitusi" },
+        { id: "28", title: "Level 28: Eliminasi" },
+        { id: "29", title: "Level 29: Grafik Fungsi" },
+        { id: "30", title: "Level 30: Transformasi Fungsi" },
+      ]
     },
     {
-      id: "3",
-      title: "Level 3: Pangkat & Akar",
-      requiredScore: 150,
-      unlocked: userData.score >= 150,
-    },
-    {
-      id: "4",
-      title: "Level 4: Aljabar Dasar",
-      requiredScore: 300,
-      unlocked: userData.score >= 300,
-    },
-    {
-      id: "5",
-      title: "Level 5: Pola Deret Angka",
-      requiredScore: 500,
-      unlocked: userData.score >= 500,
-    },
-    {
-      id: "6",
-      title: "Level 6: Aljabar Lanjut",
-      requiredScore: 800,
-      unlocked: userData.score >= 800,
-    },
-    {
-      id: "7",
-      title: "Level 7: Modulo & Sisa Bagi",
-      requiredScore: 1200,
-      unlocked: userData.score >= 1200,
-    },
-    {
-      id: "8",
-      title: "Level 8: Kombinasi Pecahan",
-      requiredScore: 1800,
-      unlocked: userData.score >= 1800,
-    },
-    {
-      id: "9",
-      title: "Level 9: Trigonometri Istimewa",
-      requiredScore: 2500,
-      unlocked: userData.score >= 2500,
-    },
-    {
-      id: "10",
-      title: "Level 10: Limit & Turunan",
-      requiredScore: 3500,
-      unlocked: userData.score >= 3500,
-    },
+      title: "Fase 3: Geometri",
+      data: [
+        { id: "31", title: "Level 31: Bangun Datar" },
+        { id: "32", title: "Level 32: Keliling & Luas" },
+        { id: "33", title: "Level 33: Bangun Ruang" },
+        { id: "34", title: "Level 34: Volume" },
+        { id: "35", title: "Level 35: Sudut" },
+        { id: "36", title: "Level 36: Segitiga" },
+        { id: "37", title: "Level 37: Lingkaran" },
+        { id: "38", title: "Level 38: Teorema Pythagoras" },
+        { id: "39", title: "Level 39: Transformasi Geometri" },
+        { id: "40", title: "Level 40: Simetri" },
+        { id: "41", title: "Level 41: Koordinat Kartesius" },
+        { id: "42", title: "Level 42: Jarak Titik" },
+        { id: "43", title: "Level 43: Garis & Gradien" },
+        { id: "44", title: "Level 44: Vektor Dasar" },
+        { id: "45", title: "Level 45: Geometri Analitik" },
+      ]
+    }
   ];
+
+  const phaseUnlocks = checkPhaseUnlock(userData);
+
+  const sections = phasesData.map((phase, index) => {
+    let isPhaseUnlocked = true;
+    if (index === 1) isPhaseUnlocked = phaseUnlocks.phase2;
+    if (index === 2) isPhaseUnlocked = phaseUnlocks.phase3;
+
+    return {
+      title: phase.title,
+      isPhaseUnlocked,
+      data: phase.data.map((lvl) => {
+        const levelNum = parseInt(lvl.id, 10);
+        const reqScore = getRequiredScore(levelNum);
+        const unlocked = isPhaseUnlocked && isLevelUnlocked(userData, lvl);
+        return {
+          ...lvl,
+          requiredScore: reqScore,
+          unlocked,
+        };
+      })
+    };
+  });
 
   const handleLogout = async () => {
     try {
@@ -235,17 +278,48 @@ export default function MainMenuScreen({ route, navigation }) {
         </Card.Content>
       </Card>
 
+      <TouchableOpacity 
+        activeOpacity={0.9} 
+        onPress={() => navigation.navigate("ChallengeMenu")}
+        style={{ marginHorizontal: "5%", marginBottom: 15, alignSelf: "center", width: "90%", maxWidth: 600 }}
+      >
+        <LinearGradient
+          colors={["#FF416C", "#FF4B2B"]}
+          style={{ padding: 15, borderRadius: 15, flexDirection: "row", alignItems: "center" }}
+        >
+          <MaterialCommunityIcons name="fire" size={32} color="#FFF" />
+          <View style={{ marginLeft: 15, flex: 1 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFF" }}>Arena Tantangan 🔥</Text>
+            <Text style={{ fontSize: 12, color: "#FFE97D" }}>Daily & Weekly Challenge Mode</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={28} color="#FFF" />
+        </LinearGradient>
+      </TouchableOpacity>
+
       <View style={styles.contentContainer}>
         <Title style={styles.sectionTitle}>
           Pilih Arena Bertarung (Sudden Death)
         </Title>
         <View style={styles.levelsWrapper}>
-          <FlatList
-            data={levels}
+          <SectionList
+            sections={sections}
             keyExtractor={(item) => item.id}
             renderItem={renderLevelItem}
+            renderSectionHeader={({ section: { title, isPhaseUnlocked } }) => (
+              <View>
+                <Text style={styles.phaseHeader}>
+                  {title} {isPhaseUnlocked ? "" : " 🔒"}
+                </Text>
+                {!isPhaseUnlocked && (
+                  <Text style={styles.phaseLockedDesc}>
+                    Selesaikan {title.includes("Fase 2") ? "70% Fase 1" : "60% Fase 2"} untuk membuka!
+                  </Text>
+                )}
+              </View>
+            )}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
+            stickySectionHeadersEnabled={false}
           />
         </View>
 
@@ -324,6 +398,29 @@ export default function MainMenuScreen({ route, navigation }) {
                   <Text style={styles.modeTitle}>Mode Nyawa (3 ❤️)</Text>
                   <Text style={styles.modeDesc}>
                     Punya 3 kesempatan sebelum Game Over
+                  </Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.modeCard}
+              onPress={() => startGame("20_questions")}
+            >
+              <LinearGradient
+                colors={["#8E2DE2", "#4A00E0"]}
+                style={styles.modeGradient}
+              >
+                <MaterialCommunityIcons
+                  name="format-list-numbered"
+                  size={28}
+                  color="#FFF"
+                />
+                <View style={styles.modeTextWrap}>
+                  <Text style={styles.modeTitle}>Mode 20 Soal 🎯</Text>
+                  <Text style={styles.modeDesc}>
+                    Selesaikan 20 soal bertahap hingga Final Boss!
                   </Text>
                 </View>
               </LinearGradient>
@@ -446,6 +543,25 @@ const styles = StyleSheet.create({
   lockedItem: {
     opacity: 0.7,
     backgroundColor: "rgba(230, 230, 230, 0.95)",
+  },
+  phaseHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFD700",
+    backgroundColor: "rgba(26, 41, 128, 0.9)",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    marginBottom: 5,
+    elevation: 3,
+  },
+  phaseLockedDesc: {
+    color: '#ffcccc',
+    fontSize: 12,
+    marginLeft: 15,
+    marginBottom: 5,
+    fontStyle: 'italic',
   },
   itemTitle: {
     fontWeight: "900",

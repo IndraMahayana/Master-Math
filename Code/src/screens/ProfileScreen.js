@@ -41,6 +41,7 @@ export default function ProfileScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [photoURL, setPhotoURL] = useState(null);
   const [history, setHistory] = useState([]);
+  const [totalScore, setTotalScore] = useState(0);
 
   const [newUsername, setNewUsername] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -50,8 +51,11 @@ export default function ProfileScreen({ navigation }) {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    loadUserData();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      loadUserData();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const loadUserData = async () => {
     if (!auth.currentUser) return;
@@ -65,6 +69,7 @@ export default function ProfileScreen({ navigation }) {
         setUsername(data.username || auth.currentUser.email.split("@")[0]);
         setNewUsername(data.username || auth.currentUser.email.split("@")[0]);
         setPhotoURL(data.photoURL || null);
+        setTotalScore(data.score || 0);
       }
 
       // Load History
@@ -176,6 +181,10 @@ export default function ProfileScreen({ navigation }) {
             </View>
             <Title style={styles.usernameTitle}>{username}</Title>
             <Text style={styles.emailSubtitle}>{auth.currentUser?.email}</Text>
+            <View style={styles.scoreBadge}>
+              <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
+              <Text style={styles.scoreBadgeText}>Total Skor: {totalScore}</Text>
+            </View>
           </Card.Content>
         </Card>
 
@@ -346,6 +355,21 @@ const styles = StyleSheet.create({
   emailSubtitle: {
     color: "#666",
     fontSize: 14,
+    marginBottom: 10,
+  },
+  scoreBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A2980',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 5,
+  },
+  scoreBadgeText: {
+    color: '#FFD700',
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
   sectionTitle: {
     margin: 15,
