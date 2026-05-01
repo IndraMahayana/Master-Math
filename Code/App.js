@@ -12,6 +12,8 @@ import MainMenuScreen from "./src/screens/MainMenuScreen";
 import GameplayScreen from "./src/screens/GameplayScreen";
 import LeaderboardScreen from "./src/screens/LeaderboardScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
+import QuestionWarehouseScreen from "./src/screens/QuestionWarehouseScreen";
+import PracticeProblemsScreen from "./src/screens/PracticeProblemsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +42,8 @@ const linking = {
       Gameplay: "gameplay",
       Leaderboard: "leaderboard",
       Profile: "profile",
+      QuestionWarehouse: "warehouse",
+      PracticeProblems: "practice",
     },
   },
 };
@@ -101,6 +105,16 @@ export default function App() {
               name="Profile"
               component={ProfileScreen}
               options={{ title: "Profil Pengguna" }}
+            />
+            <Stack.Screen
+              name="QuestionWarehouse"
+              component={QuestionWarehouseScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="PracticeProblems"
+              component={PracticeProblemsScreen}
+              options={{ headerShown: false }}
             />
           </Stack.Navigator>
         </NavigationContainer>

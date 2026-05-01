@@ -8,7 +8,15 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { Text, Button, Title, Card, List, Dialog, Portal } from "react-native-paper";
+import {
+  Text,
+  Button,
+  Title,
+  Card,
+  List,
+  Dialog,
+  Portal,
+} from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth, db } from "../firebaseConfig";
@@ -18,7 +26,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function MainMenuScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
-  
+
   const [userData, setUserData] = useState({
     username:
       route.params?.playerName ||
@@ -177,7 +185,10 @@ export default function MainMenuScreen({ route, navigation }) {
   );
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}>
+    <LinearGradient
+      colors={["#1A2980", "#26D0CE"]}
+      style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}
+    >
       <Card style={styles.profileCard}>
         <Card.Content style={styles.profileContent}>
           <TouchableOpacity
@@ -248,41 +259,83 @@ export default function MainMenuScreen({ route, navigation }) {
         >
           Lihat Papan Peringkat
         </Button>
+
+        <Button
+          mode="contained"
+          icon="book-multiple"
+          onPress={() => navigation.navigate("QuestionWarehouse")}
+          style={styles.warehouseButton}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.warehouseLabel}
+        >
+          Gudang Soal (Latihan)
+        </Button>
       </View>
 
       {/* Mode Selection Dialog */}
       <Portal>
-        <Dialog visible={showModeDialog} onDismiss={() => setShowModeDialog(false)} style={styles.dialogStyle}>
-          <Dialog.Title style={styles.dialogTitle}>Pilih Mode Permainan</Dialog.Title>
+        <Dialog
+          visible={showModeDialog}
+          onDismiss={() => setShowModeDialog(false)}
+          style={styles.dialogStyle}
+        >
+          <Dialog.Title style={styles.dialogTitle}>
+            Pilih Mode Permainan
+          </Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.dialogSub}>Tentukan tingkat kesulitanmu untuk {selectedLevel?.title}:</Text>
-            
-            <TouchableOpacity activeOpacity={0.8} style={styles.modeCard} onPress={() => startGame("sudden_death")}>
-              <LinearGradient colors={["#FF416C", "#FF4B2B"]} style={styles.modeGradient}>
+            <Text style={styles.dialogSub}>
+              Tentukan tingkat kesulitanmu untuk {selectedLevel?.title}:
+            </Text>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.modeCard}
+              onPress={() => startGame("sudden_death")}
+            >
+              <LinearGradient
+                colors={["#FF416C", "#FF4B2B"]}
+                style={styles.modeGradient}
+              >
                 <MaterialCommunityIcons name="skull" size={28} color="#FFF" />
                 <View style={styles.modeTextWrap}>
                   <Text style={styles.modeTitle}>Sudden Death</Text>
-                  <Text style={styles.modeDesc}>1 Kali Salah / Waktu Habis = Kalah</Text>
+                  <Text style={styles.modeDesc}>
+                    1 Kali Salah / Waktu Habis = Kalah
+                  </Text>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.8} style={styles.modeCard} onPress={() => startGame("lives")}>
-              <LinearGradient colors={["#11998e", "#38ef7d"]} style={styles.modeGradient}>
-                <MaterialCommunityIcons name="cards-heart" size={28} color="#FFF" />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.modeCard}
+              onPress={() => startGame("lives")}
+            >
+              <LinearGradient
+                colors={["#11998e", "#38ef7d"]}
+                style={styles.modeGradient}
+              >
+                <MaterialCommunityIcons
+                  name="cards-heart"
+                  size={28}
+                  color="#FFF"
+                />
                 <View style={styles.modeTextWrap}>
                   <Text style={styles.modeTitle}>Mode Nyawa (3 ❤️)</Text>
-                  <Text style={styles.modeDesc}>Punya 3 kesempatan sebelum Game Over</Text>
+                  <Text style={styles.modeDesc}>
+                    Punya 3 kesempatan sebelum Game Over
+                  </Text>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowModeDialog(false)} textColor="#666">Batal</Button>
+            <Button onPress={() => setShowModeDialog(false)} textColor="#666">
+              Batal
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
-
     </LinearGradient>
   );
 }
@@ -423,11 +476,20 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "#1A2980",
     elevation: 5,
-    marginBottom: 20,
+    marginBottom: 10,
     marginTop: 10,
     marginHorizontal: 5,
     borderWidth: 2,
     borderColor: "#26D0CE",
+  },
+  warehouseButton: {
+    borderRadius: 15,
+    backgroundColor: "#FF6B6B",
+    elevation: 5,
+    marginBottom: 20,
+    marginHorizontal: 5,
+    borderWidth: 2,
+    borderColor: "#FF8E72",
   },
   buttonContent: {
     paddingVertical: 10,
@@ -436,6 +498,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#26D0CE",
+  },
+  warehouseLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
   },
   dialogStyle: {
     backgroundColor: "#fff",
