@@ -1,13 +1,16 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, Text } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Import Screens
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
+import HomeScreen from "./src/screens/HomeScreen";
 import MainMenuScreen from "./src/screens/MainMenuScreen";
 import GameplayScreen from "./src/screens/GameplayScreen";
 import LeaderboardScreen from "./src/screens/LeaderboardScreen";
@@ -18,6 +21,7 @@ import ChallengeMenuScreen from "./src/screens/ChallengeMenuScreen";
 import ChallengeLeaderboardScreen from "./src/screens/ChallengeLeaderboardScreen";
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 const theme = {
   ...DefaultTheme,
@@ -40,15 +44,189 @@ const linking = {
     screens: {
       Login: "",
       Register: "register",
+      Home: "home",
       MainMenu: "mainmenu",
       Gameplay: "gameplay",
       Leaderboard: "leaderboard",
       Profile: "profile",
       QuestionWarehouse: "warehouse",
       PracticeProblems: "practice",
+      ChallengeMenu: "challenge",
     },
   },
 };
+
+// Home Stack Navigator
+function HomeStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#1A2980" },
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MainMenu"
+        component={MainMenuScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Gameplay"
+        component={GameplayScreen}
+        options={{ title: "Master Math" }}
+      />
+      <Stack.Screen
+        name="ChallengeMenu"
+        component={ChallengeMenuScreen}
+        options={{ title: "Arena Tantangan" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Question Warehouse Stack Navigator
+function QuestionStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#1A2980" },
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen
+        name="QuestionWarehouse"
+        component={QuestionWarehouseScreen}
+        options={{ title: "Gudang Soal" }}
+      />
+      <Stack.Screen
+        name="PracticeProblems"
+        component={PracticeProblemsScreen}
+        options={{ title: "Latihan Soal" }}
+      />
+      <Stack.Screen
+        name="Gameplay2"
+        component={GameplayScreen}
+        options={{ title: "Soal Latihan" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Leaderboard Stack Navigator
+function LeaderboardStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#1A2980" },
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen
+        name="LeaderboardScreen"
+        component={LeaderboardScreen}
+        options={{ title: "Papan Peringkat" }}
+      />
+      <Stack.Screen
+        name="ChallengeLeaderboard"
+        component={ChallengeLeaderboardScreen}
+        options={{ title: "Papan Peringkat Tantangan" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Profile Stack Navigator
+function ProfileStackNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#1A2980" },
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={{ title: "Profil Saya" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Bottom Tab Navigator
+function BottomTabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === "HomeTab") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "QuestionTab") {
+            iconName = focused ? "book" : "book-outline";
+          } else if (route.name === "LeaderboardTab") {
+            iconName = focused ? "trophy" : "trophy-outline";
+          } else if (route.name === "ProfileTab") {
+            iconName = focused ? "account" : "account-outline";
+          }
+          return (
+            <MaterialCommunityIcons name={iconName} size={24} color={color} />
+          );
+        },
+        tabBarActiveTintColor: "#1A2980",
+        tabBarInactiveTintColor: "#999",
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          borderTopColor: "#e0e0e0",
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+          marginTop: 4,
+        },
+      })}
+    >
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeStackNavigator}
+        options={{ tabBarLabel: "Beranda" }}
+      />
+      <Tab.Screen
+        name="QuestionTab"
+        component={QuestionStackNavigator}
+        options={{ tabBarLabel: "Gudang Soal" }}
+      />
+      <Tab.Screen
+        name="LeaderboardTab"
+        component={LeaderboardStackNavigator}
+        options={{ tabBarLabel: "Peringkat" }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStackNavigator}
+        options={{ tabBarLabel: "Profil" }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   return (
@@ -89,44 +267,9 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="MainMenu"
-              component={MainMenuScreen}
+              name="AppTabs"
+              component={BottomTabNavigator}
               options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Gameplay"
-              component={GameplayScreen}
-              options={{ title: "Master Math" }}
-            />
-            <Stack.Screen
-              name="Leaderboard"
-              component={LeaderboardScreen}
-              options={{ title: "Papan Peringkat" }}
-            />
-            <Stack.Screen
-              name="Profile"
-              component={ProfileScreen}
-              options={{ title: "Profil Pengguna" }}
-            />
-            <Stack.Screen
-              name="QuestionWarehouse"
-              component={QuestionWarehouseScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="PracticeProblems"
-              component={PracticeProblemsScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ChallengeMenu"
-              component={ChallengeMenuScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ChallengeLeaderboard"
-              component={ChallengeLeaderboardScreen}
-              options={{ title: "Papan Peringkat Tantangan" }}
             />
           </Stack.Navigator>
         </NavigationContainer>

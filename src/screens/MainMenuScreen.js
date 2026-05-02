@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   StyleSheet,
@@ -8,6 +8,7 @@ import {
   Alert,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import {
   Text,
@@ -24,11 +25,40 @@ import { auth, db } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { checkPhaseUnlock, getRequiredScore } from "../systems/progressionSystem";
+import {
+  checkPhaseUnlock,
+  getRequiredScore,
+} from "../systems/progressionSystem";
 import { isLevelUnlocked } from "../systems/challengeSystem";
+import {
+  getResponsiveFontSize,
+  getResponsiveWidth,
+  getResponsiveSpacing,
+  getDeviceType,
+  getNumColumns,
+  getContentPadding,
+  getResponsiveElevation,
+  getMaxContentWidth,
+} from "../utils/responsiveUtils";
 
 export default function MainMenuScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
+  const deviceType = getDeviceType();
+  const numColumns = getNumColumns();
+
+  // Responsive styles
+  const responsiveStyles = useMemo(
+    () => ({
+      containerPadding: getContentPadding(),
+      contentPadding: getResponsiveSpacing(15),
+      profileCardPadding: getResponsiveSpacing(20),
+      itemTitleSize: getResponsiveFontSize(14),
+      itemDescSize: getResponsiveFontSize(12),
+      sectionTitleSize: getResponsiveFontSize(18),
+      elevation: getResponsiveElevation(4),
+    }),
+    [deviceType],
+  );
 
   const [userData, setUserData] = useState({
     username:
@@ -50,18 +80,21 @@ export default function MainMenuScreen({ route, navigation }) {
           const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
           if (userSnap.exists()) {
             let data = userSnap.data();
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split("T")[0];
             const lastLogin = data.lastLoginDate;
 
             if (lastLogin !== today) {
               const newScore = (data.score || 0) + 1000;
               await updateDoc(doc(db, "users", auth.currentUser.uid), {
                 lastLoginDate: today,
-                score: newScore
+                score: newScore,
               });
               data.score = newScore;
               data.lastLoginDate = today;
-              Alert.alert("🎉 Bonus Login Harian!", "Kamu mendapatkan +1000 Poin untuk login hari ini!");
+              Alert.alert(
+                "🎉 Bonus Login Harian!",
+                "Kamu mendapatkan +1000 Poin untuk login hari ini!",
+              );
             }
 
             setUserData(data);
@@ -98,7 +131,7 @@ export default function MainMenuScreen({ route, navigation }) {
         { id: "13", title: "Level 13: Faktor & Kelipatan" },
         { id: "14", title: "Level 14: FPB & KPK" },
         { id: "15", title: "Level 15: Bilangan Negatif" },
-      ]
+      ],
     },
     {
       title: "Fase 2: Aljabar",
@@ -118,7 +151,7 @@ export default function MainMenuScreen({ route, navigation }) {
         { id: "28", title: "Level 28: Eliminasi" },
         { id: "29", title: "Level 29: Grafik Fungsi" },
         { id: "30", title: "Level 30: Transformasi Fungsi" },
-      ]
+      ],
     },
     {
       title: "Fase 3: Geometri",
@@ -138,8 +171,8 @@ export default function MainMenuScreen({ route, navigation }) {
         { id: "43", title: "Level 43: Garis & Gradien" },
         { id: "44", title: "Level 44: Vektor Dasar" },
         { id: "45", title: "Level 45: Geometri Analitik" },
-      ]
-    }
+      ],
+    },
   ];
 
   const phaseUnlocks = checkPhaseUnlock(userData);
@@ -161,17 +194,23 @@ export default function MainMenuScreen({ route, navigation }) {
           requiredScore: reqScore,
           unlocked,
         };
-      })
+      }),
     };
   });
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.replace("Login");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
     } catch (error) {
       console.log("Error signing out: ", error);
-      navigation.replace("Login");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
     }
   };
 
@@ -278,19 +317,34 @@ export default function MainMenuScreen({ route, navigation }) {
         </Card.Content>
       </Card>
 
-      <TouchableOpacity 
-        activeOpacity={0.9} 
+      <TouchableOpacity
+        activeOpacity={0.9}
         onPress={() => navigation.navigate("ChallengeMenu")}
-        style={{ marginHorizontal: "5%", marginBottom: 15, alignSelf: "center", width: "90%", maxWidth: 600 }}
+        style={{
+          marginHorizontal: "5%",
+          marginBottom: 15,
+          alignSelf: "center",
+          width: "90%",
+          maxWidth: 600,
+        }}
       >
         <LinearGradient
           colors={["#FF416C", "#FF4B2B"]}
-          style={{ padding: 15, borderRadius: 15, flexDirection: "row", alignItems: "center" }}
+          style={{
+            padding: 15,
+            borderRadius: 15,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
           <MaterialCommunityIcons name="fire" size={32} color="#FFF" />
           <View style={{ marginLeft: 15, flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFF" }}>Arena Tantangan 🔥</Text>
-            <Text style={{ fontSize: 12, color: "#FFE97D" }}>Daily & Weekly Challenge Mode</Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFF" }}>
+              Arena Tantangan 🔥
+            </Text>
+            <Text style={{ fontSize: 12, color: "#FFE97D" }}>
+              Daily & Weekly Challenge Mode
+            </Text>
           </View>
           <MaterialCommunityIcons name="chevron-right" size={28} color="#FFF" />
         </LinearGradient>
@@ -312,7 +366,9 @@ export default function MainMenuScreen({ route, navigation }) {
                 </Text>
                 {!isPhaseUnlocked && (
                   <Text style={styles.phaseLockedDesc}>
-                    Selesaikan {title.includes("Fase 2") ? "70% Fase 1" : "60% Fase 2"} untuk membuka!
+                    Selesaikan{" "}
+                    {title.includes("Fase 2") ? "70% Fase 1" : "60% Fase 2"}{" "}
+                    untuk membuka!
                   </Text>
                 )}
               </View>
@@ -455,20 +511,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 8,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    paddingHorizontal: 15,
   },
   avatarPlaceholder: {
-    width: 45,
-    height: 45,
+    width: 50,
+    height: 50,
     borderRadius: 25,
     backgroundColor: "#1A2980",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 12,
     elevation: 3,
   },
   avatarInitial: {
@@ -481,30 +539,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileIconButton: {
-    padding: 8,
-    marginLeft: 10,
+    padding: 10,
+    marginLeft: 8,
   },
   textWrap: {
     flex: 1,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "900",
     color: "#1A2980",
   },
   scoreText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#4a4a4a",
+    marginLeft: 4,
   },
   scoreBold: {
     fontWeight: "bold",
     color: "#FF9800",
-    fontSize: 16,
+    fontSize: 14,
   },
   logoutLabel: {
     color: "#D32F2F",
     fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 11,
   },
   contentContainer: {
     flex: 1,
@@ -512,16 +571,17 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 15,
-    paddingHorizontal: "5%",
+    paddingHorizontal: 15,
+    marginHorizontal: "5%",
     maxWidth: 800,
-    width: "100%",
+    width: "90%",
     alignSelf: "center",
   },
   sectionTitle: {
     color: "#FFD700",
     fontWeight: "900",
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 16,
+    marginBottom: 12,
     marginLeft: 5,
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
@@ -529,48 +589,50 @@ const styles = StyleSheet.create({
   },
   levelsWrapper: {
     flex: 1,
+    marginBottom: 10,
   },
   listContainer: {
     paddingBottom: 20,
+    paddingHorizontal: 5,
   },
   listItem: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 15,
     marginBottom: 12,
     elevation: 4,
-    paddingVertical: 5,
+    paddingVertical: 8,
   },
   lockedItem: {
     opacity: 0.7,
     backgroundColor: "rgba(230, 230, 230, 0.95)",
   },
   phaseHeader: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#FFD700",
     backgroundColor: "rgba(26, 41, 128, 0.9)",
     paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     borderRadius: 10,
     marginTop: 10,
     marginBottom: 5,
     elevation: 3,
   },
   phaseLockedDesc: {
-    color: '#ffcccc',
-    fontSize: 12,
-    marginLeft: 15,
+    color: "#ffcccc",
+    fontSize: 11,
+    marginLeft: 12,
     marginBottom: 5,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   itemTitle: {
     fontWeight: "900",
-    fontSize: 15,
+    fontSize: 13,
     color: "#1A2980",
   },
   itemDesc: {
     color: "#555",
-    fontSize: 12,
+    fontSize: 11,
   },
   iconContainer: {
     justifyContent: "center",
@@ -611,28 +673,32 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   buttonLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     color: "#26D0CE",
   },
   warehouseLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     color: "#FFF",
   },
   dialogStyle: {
     backgroundColor: "#fff",
     borderRadius: 20,
+    maxWidth: 500,
+    alignSelf: "center",
   },
   dialogTitle: {
     textAlign: "center",
     fontWeight: "900",
     color: "#1A2980",
+    fontSize: 16,
   },
   dialogSub: {
     textAlign: "center",
     marginBottom: 15,
     color: "#555",
+    fontSize: 13,
   },
   modeCard: {
     marginBottom: 12,
@@ -646,17 +712,17 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   modeTextWrap: {
-    marginLeft: 15,
+    marginLeft: 12,
     flex: 1,
   },
   modeTitle: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
   },
   modeDesc: {
     color: "#eee",
-    fontSize: 12,
+    fontSize: 11,
     marginTop: 2,
   },
 });

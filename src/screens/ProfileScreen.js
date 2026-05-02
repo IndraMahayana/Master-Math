@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   StyleSheet,
@@ -23,6 +23,7 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  signOut,
 } from "firebase/auth";
 import {
   doc,
@@ -36,8 +37,26 @@ import {
   limit,
 } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  getResponsiveFontSize,
+  getResponsiveSpacing,
+  getDeviceType,
+  getContentPadding,
+} from "../utils/responsiveUtils";
 
 export default function ProfileScreen({ navigation }) {
+  const deviceType = getDeviceType();
+
+  // Responsive styles
+  const responsiveStyles = useMemo(
+    () => ({
+      containerPadding: getContentPadding(),
+      titleFontSize: getResponsiveFontSize(28),
+      labelFontSize: getResponsiveFontSize(14),
+      inputPadding: getResponsiveSpacing(12),
+    }),
+    [deviceType],
+  );
   const [username, setUsername] = useState("");
   const [photoURL, setPhotoURL] = useState(null);
   const [history, setHistory] = useState([]);
@@ -114,9 +133,9 @@ export default function ProfileScreen({ navigation }) {
         username: newUsername,
       });
       setUsername(newUsername);
-      Alert.alert("Sukses", "Username berhasil diperbarui!");
+      Alert.alert("✅ Sukses", "Username berhasil diupdate!");
     } catch (error) {
-      Alert.alert("Gagal", "Terjadi kesalahan: " + error.message);
+      Alert.alert("❌ Gagal", error.message);
     } finally {
       setActionLoading(false);
     }
@@ -146,6 +165,22 @@ export default function ProfileScreen({ navigation }) {
       );
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    } catch (error) {
+      console.log("Error signing out: ", error);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
     }
   };
 
@@ -183,7 +218,9 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.emailSubtitle}>{auth.currentUser?.email}</Text>
             <View style={styles.scoreBadge}>
               <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
-              <Text style={styles.scoreBadgeText}>Total Skor: {totalScore}</Text>
+              <Text style={styles.scoreBadgeText}>
+                Total Skor: {totalScore}
+              </Text>
             </View>
           </Card.Content>
         </Card>
@@ -280,6 +317,18 @@ export default function ProfileScreen({ navigation }) {
             )}
           </Card.Content>
         </Card>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Button
+              mode="contained"
+              onPress={handleLogout}
+              style={[styles.actionButton, { backgroundColor: "#FF6B6B" }]}
+            >
+              Keluar (Logout)
+            </Button>
+          </Card.Content>
+        </Card>
       </ScrollView>
     </LinearGradient>
   );
@@ -358,17 +407,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   scoreBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1A2980',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A2980",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     marginTop: 5,
   },
   scoreBadgeText: {
-    color: '#FFD700',
-    fontWeight: 'bold',
+    color: "#FFD700",
+    fontWeight: "bold",
     marginLeft: 5,
   },
   sectionTitle: {

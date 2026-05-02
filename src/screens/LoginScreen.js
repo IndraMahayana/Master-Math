@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   StyleSheet,
   Alert,
   Dimensions,
   TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Text, TextInput, Button, Title } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +21,13 @@ import { auth, db } from "../firebaseConfig";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  getResponsiveFontSize,
+  getResponsiveWidth,
+  getResponsiveSpacing,
+  getDeviceType,
+  getResponsiveElevation,
+} from "../utils/responsiveUtils";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -26,6 +36,21 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const deviceType = getDeviceType();
+
+  // Responsive styles
+  const responsiveStyles = useMemo(
+    () => ({
+      cardWidth: getResponsiveWidth(90, 500),
+      titleSize: getResponsiveFontSize(32),
+      subtitleSize: getResponsiveFontSize(14),
+      padding: getResponsiveSpacing(30),
+      inputMargin: getResponsiveSpacing(10),
+      buttonMargin: getResponsiveSpacing(10),
+      elevation: getResponsiveElevation(10),
+    }),
+    [deviceType],
+  );
 
   // [PLACEHOLDER] SILAKAN GANTI DENGAN CLIENT ID MILIK ANDA DARI GOOGLE CLOUD CONSOLE
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -61,7 +86,12 @@ export default function LoginScreen({ navigation }) {
           }
 
           setLoading(false);
-          navigation.replace("MainMenu", { playerName, score: currentScore });
+          navigation.reset({
+            index: 0,
+            routes: [
+              { name: "AppTabs", params: { playerName, score: currentScore } },
+            ],
+          });
         })
         .catch((error) => {
           setLoading(false);
@@ -129,103 +159,149 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleGuestPlay = () => {
-    navigation.replace("MainMenu", { playerName: "Guest", score: 0 });
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "AppTabs", params: { playerName: "Guest", score: 0 } }],
+    });
   };
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoBadge}>
-            <MaterialCommunityIcons
-              name="calculator-variant"
-              size={35}
-              color="#fff"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <LinearGradient
+          colors={["#1A2980", "#26D0CE"]}
+          style={styles.gradientContainer}
+        >
+          <View style={[styles.card, { width: responsiveStyles.cardWidth }]}>
+            <View style={styles.logoContainer}>
+              <View
+                style={[
+                  styles.logoBadge,
+                  { elevation: responsiveStyles.elevation },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="calculator-variant"
+                  size={getResponsiveFontSize(35)}
+                  color="#fff"
+                />
+              </View>
+            </View>
+            <Title
+              style={[styles.title, { fontSize: responsiveStyles.titleSize }]}
+            >
+              Master Math
+            </Title>
+            <Text
+              style={[
+                styles.subtitle,
+                { fontSize: responsiveStyles.subtitleSize },
+              ]}
+            >
+              Selamat datang kembali!
+            </Text>
+
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              style={[
+                styles.input,
+                { marginBottom: responsiveStyles.inputMargin },
+              ]}
+              mode="outlined"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              outlineColor="#e0e0e0"
+              activeOutlineColor="#26D0CE"
+              left={<TextInput.Icon icon="email" color="#1A2980" />}
             />
+
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              style={[
+                styles.input,
+                { marginBottom: responsiveStyles.inputMargin },
+              ]}
+              mode="outlined"
+              secureTextEntry={!showPassword}
+              outlineColor="#e0e0e0"
+              activeOutlineColor="#26D0CE"
+              left={<TextInput.Icon icon="lock" color="#1A2980" />}
+              right={
+                <TextInput.Icon
+                  icon={showPassword ? "eye-off" : "eye"}
+                  color="#1A2980"
+                  onPress={() => setShowPassword(!showPassword)}
+                />
+              }
+            />
+
+            <Button
+              mode="contained"
+              icon="login-variant"
+              onPress={handleLogin}
+              style={[
+                styles.button,
+                { marginTop: responsiveStyles.buttonMargin },
+              ]}
+              contentStyle={styles.buttonContent}
+              loading={loading}
+              disabled={loading}
+            >
+              Login
+            </Button>
+
+            <Text style={styles.divider}>ATAU</Text>
+
+            <Button
+              mode="outlined"
+              icon="google"
+              onPress={() => promptAsync()}
+              style={[
+                styles.button,
+                styles.googleButton,
+                { marginTop: responsiveStyles.buttonMargin },
+              ]}
+              contentStyle={styles.buttonContent}
+              textColor="#D32F2F"
+              disabled={!request || loading}
+            >
+              Masuk dengan Google
+            </Button>
+
+            <Button
+              mode="text"
+              icon="account-question-outline"
+              onPress={handleGuestPlay}
+              style={styles.guestButton}
+              textColor="#4a4a4a"
+              disabled={loading}
+            >
+              Play as Guest
+            </Button>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Register")}
+              style={styles.linkContainer}
+            >
+              <Text style={styles.linkText}>
+                Belum punya akun?{" "}
+                <Text style={styles.linkTextBold}>Daftar</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
-        <Title style={styles.title}>Master Math</Title>
-        <Text style={styles.subtitle}>Selamat datang kembali!</Text>
-
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          mode="outlined"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          outlineColor="#e0e0e0"
-          activeOutlineColor="#26D0CE"
-          left={<TextInput.Icon icon="email" color="#1A2980" />}
-        />
-
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          mode="outlined"
-          secureTextEntry={!showPassword}
-          outlineColor="#e0e0e0"
-          activeOutlineColor="#26D0CE"
-          left={<TextInput.Icon icon="lock" color="#1A2980" />}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? "eye-off" : "eye"}
-              color="#1A2980"
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-        />
-
-        <Button
-          mode="contained"
-          icon="login-variant"
-          onPress={handleLogin}
-          style={styles.button}
-          contentStyle={styles.buttonContent}
-          loading={loading}
-          disabled={loading}
-        >
-          Login
-        </Button>
-
-        <Text style={styles.divider}>ATAU</Text>
-
-        <Button
-          mode="outlined"
-          icon="google"
-          onPress={() => promptAsync()}
-          style={[styles.button, styles.googleButton]}
-          contentStyle={styles.buttonContent}
-          textColor="#D32F2F"
-          disabled={!request || loading}
-        >
-          Masuk dengan Google
-        </Button>
-
-        <Button
-          mode="text"
-          icon="account-question-outline"
-          onPress={handleGuestPlay}
-          style={styles.guestButton}
-          textColor="#4a4a4a"
-          disabled={loading}
-        >
-          Play as Guest
-        </Button>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Register")}
-          style={styles.linkContainer}
-        >
-          <Text style={styles.linkText}>
-            Belum punya akun? <Text style={styles.linkTextBold}>Daftar</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+        </LinearGradient>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -234,13 +310,21 @@ const windowWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+  },
+  gradientContainer: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 20,
   },
   card: {
-    width: windowWidth * 0.9,
-    maxWidth: 400,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     padding: 30,
     borderRadius: 20,
@@ -251,7 +335,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   title: {
-    fontSize: 32,
     fontWeight: "900",
     textAlign: "center",
     color: "#1A2980",
@@ -261,14 +344,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 25,
     color: "#4a4a4a",
-    fontSize: 14,
   },
   input: {
-    marginBottom: 10,
     backgroundColor: "#fff",
   },
   button: {
-    marginTop: 10,
     borderRadius: 15,
     backgroundColor: "#1A2980",
     elevation: 4,
@@ -313,7 +393,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A2980",
     justifyContent: "center",
     alignItems: "center",
-    elevation: 4,
     shadowColor: "#1A2980",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
