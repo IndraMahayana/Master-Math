@@ -149,7 +149,12 @@ export default function LoginScreen({ navigation }) {
         console.log("Firestore fetch error on login", dbError);
       }
 
-      navigation.replace("MainMenu", { playerName, score: currentScore });
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: "AppTabs", params: { playerName, score: currentScore } },
+        ],
+      });
     } catch (error) {
       console.error(error);
       Alert.alert("Login Gagal", getErrorMessage(error.code));

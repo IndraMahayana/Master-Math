@@ -72,6 +72,11 @@ export default function MainMenuScreen({ route, navigation }) {
 
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(null);
+  const [expandedPhases, setExpandedPhases] = useState({
+    0: true,
+    1: false,
+    2: false,
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -214,6 +219,13 @@ export default function MainMenuScreen({ route, navigation }) {
     }
   };
 
+  const togglePhase = (phaseIndex) => {
+    setExpandedPhases((prev) => ({
+      ...prev,
+      [phaseIndex]: !prev[phaseIndex],
+    }));
+  };
+
   const handleSelectLevel = (level) => {
     if (level.unlocked) {
       setSelectedLevel(level);
@@ -271,136 +283,210 @@ export default function MainMenuScreen({ route, navigation }) {
       colors={["#1A2980", "#26D0CE"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}
     >
-      <Card style={styles.profileCard}>
-        <Card.Content style={styles.profileContent}>
-          <TouchableOpacity
-            style={styles.userInfo}
-            onPress={() => navigation.navigate("Profile")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.avatarPlaceholder}>
-              <MaterialCommunityIcons
-                name="account-circle"
-                size={45}
-                color="#fff"
-              />
-            </View>
-            <View style={styles.textWrap}>
-              <Title style={styles.welcomeText} numberOfLines={1}>
-                {userData.username}
-              </Title>
-              <View style={styles.scoreContainer}>
-                <MaterialCommunityIcons name="star" size={14} color="#FF9800" />
-                <Text style={styles.scoreText}>
-                  {" "}
-                  Skor:{" "}
-                  <Text style={styles.scoreBold}>{userData.score} Pts</Text>
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Profile")}
-            style={styles.profileIconButton}
-          >
-            <MaterialCommunityIcons name="cog" size={24} color="#1A2980" />
-          </TouchableOpacity>
-          <Button
-            mode="text"
-            icon="logout"
-            onPress={handleLogout}
-            labelStyle={styles.logoutLabel}
-            compact
-          >
-            Logout
-          </Button>
-        </Card.Content>
-      </Card>
-
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => navigation.navigate("ChallengeMenu")}
-        style={{
-          marginHorizontal: "5%",
-          marginBottom: 15,
-          alignSelf: "center",
-          width: "90%",
-          maxWidth: 600,
-        }}
+      <ScrollView
+        style={styles.mainScrollView}
+        showsVerticalScrollIndicator={true}
+        scrollIndicatorInsets={{ right: 1 }}
       >
-        <LinearGradient
-          colors={["#FF416C", "#FF4B2B"]}
-          style={{
-            padding: 15,
-            borderRadius: 15,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() =>
+            navigation
+              .getParent()
+              ?.navigate("ProfileTab", { screen: "ProfileScreen" })
+          }
+          style={styles.profileCard}
         >
-          <MaterialCommunityIcons name="fire" size={32} color="#FFF" />
-          <View style={{ marginLeft: 15, flex: 1 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#FFF" }}>
-              Arena Tantangan 🔥
-            </Text>
-            <Text style={{ fontSize: 12, color: "#FFE97D" }}>
-              Daily & Weekly Challenge Mode
-            </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={28} color="#FFF" />
-        </LinearGradient>
-      </TouchableOpacity>
-
-      <View style={styles.contentContainer}>
-        <Title style={styles.sectionTitle}>
-          Pilih Arena Bertarung (Sudden Death)
-        </Title>
-        <View style={styles.levelsWrapper}>
-          <SectionList
-            sections={sections}
-            keyExtractor={(item) => item.id}
-            renderItem={renderLevelItem}
-            renderSectionHeader={({ section: { title, isPhaseUnlocked } }) => (
-              <View>
-                <Text style={styles.phaseHeader}>
-                  {title} {isPhaseUnlocked ? "" : " 🔒"}
-                </Text>
-                {!isPhaseUnlocked && (
-                  <Text style={styles.phaseLockedDesc}>
-                    Selesaikan{" "}
-                    {title.includes("Fase 2") ? "70% Fase 1" : "60% Fase 2"}{" "}
-                    untuk membuka!
-                  </Text>
-                )}
+          <Card style={styles.profileCardInner}>
+            <Card.Content style={styles.profileContent}>
+              <View style={styles.avatarPlaceholder}>
+                <MaterialCommunityIcons
+                  name="account-circle"
+                  size={getResponsiveFontSize(45)}
+                  color="#fff"
+                />
               </View>
-            )}
-            contentContainerStyle={styles.listContainer}
-            showsVerticalScrollIndicator={false}
-            stickySectionHeadersEnabled={false}
-          />
+              <View style={styles.textWrap}>
+                <Title
+                  style={[
+                    styles.welcomeText,
+                    { fontSize: getResponsiveFontSize(18) },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {userData.username}
+                </Title>
+                <View style={styles.scoreContainer}>
+                  <MaterialCommunityIcons
+                    name="star"
+                    size={16}
+                    color="#FF9800"
+                  />
+                  <Text
+                    style={[
+                      styles.scoreText,
+                      { fontSize: getResponsiveFontSize(12) },
+                    ]}
+                  >
+                    Skor: <Text style={styles.scoreBold}>{userData.score}</Text>{" "}
+                    Pts
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Profile")}
+                style={styles.settingsButton}
+              >
+                <MaterialCommunityIcons name="cog" size={24} color="#26D0CE" />
+              </TouchableOpacity>
+            </Card.Content>
+          </Card>
+        </TouchableOpacity>
+
+        <View style={styles.quickAccessSection}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate("ChallengeMenu")}
+            style={styles.challengeButton}
+          >
+            <LinearGradient
+              colors={["#FF416C", "#FF4B2B"]}
+              style={styles.challengeGradient}
+            >
+              <MaterialCommunityIcons name="fire" size={32} color="#FFF" />
+              <View style={styles.challengeTextWrap}>
+                <Text
+                  style={[
+                    styles.challengeTitle,
+                    { fontSize: getResponsiveFontSize(16) },
+                  ]}
+                >
+                  🔥 Arena Tantangan
+                </Text>
+                <Text
+                  style={[
+                    styles.challengeDesc,
+                    { fontSize: getResponsiveFontSize(11) },
+                  ]}
+                >
+                  Tantangan Harian & Mingguan
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={24}
+                color="#FFF"
+              />
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
-        <Button
-          mode="contained"
-          icon="trophy"
-          onPress={() => navigation.navigate("Leaderboard")}
-          style={styles.leaderboardButton}
-          contentStyle={styles.buttonContent}
-          labelStyle={styles.buttonLabel}
-        >
-          Lihat Papan Peringkat
-        </Button>
+        <View style={styles.contentContainer}>
+          <View style={styles.topButtonsContainer}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("Leaderboard")}
+              style={styles.topButton}
+            >
+              <LinearGradient
+                colors={["#1A2980", "#0D1B4D"]}
+                style={styles.topButtonGradient}
+              >
+                <MaterialCommunityIcons
+                  name="trophy"
+                  size={24}
+                  color="#26D0CE"
+                />
+                <Text
+                  style={[
+                    styles.topButtonText,
+                    { fontSize: getResponsiveFontSize(13) },
+                  ]}
+                >
+                  Papan Peringkat
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
 
-        <Button
-          mode="contained"
-          icon="book-multiple"
-          onPress={() => navigation.navigate("QuestionWarehouse")}
-          style={styles.warehouseButton}
-          contentStyle={styles.buttonContent}
-          labelStyle={styles.warehouseLabel}
-        >
-          Gudang Soal (Latihan)
-        </Button>
-      </View>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("QuestionWarehouse")}
+              style={styles.topButton}
+            >
+              <LinearGradient
+                colors={["#FF6B6B", "#FF5252"]}
+                style={styles.topButtonGradient}
+              >
+                <MaterialCommunityIcons
+                  name="book-open-variant"
+                  size={24}
+                  color="#FFF"
+                />
+                <Text
+                  style={[
+                    styles.topButtonText,
+                    { fontSize: getResponsiveFontSize(13), color: "#FFF" },
+                  ]}
+                >
+                  Gudang Soal
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+
+          <Title
+            style={[
+              styles.sectionTitle,
+              { fontSize: getResponsiveFontSize(16) },
+            ]}
+          >
+            ⚔️ Pilih Level
+          </Title>
+
+          {sections.map((section, phaseIndex) => (
+            <View key={phaseIndex} style={styles.phaseContainer}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => togglePhase(phaseIndex)}
+                style={styles.phaseHeaderTouchable}
+              >
+                <View style={styles.phaseHeaderContent}>
+                  <MaterialCommunityIcons
+                    name={
+                      expandedPhases[phaseIndex]
+                        ? "chevron-down"
+                        : "chevron-right"
+                    }
+                    size={24}
+                    color="#FFF"
+                  />
+                  <Text style={styles.phaseHeader}>
+                    {section.title} {section.isPhaseUnlocked ? "" : " 🔒"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              {!section.isPhaseUnlocked && expandedPhases[phaseIndex] && (
+                <Text style={styles.phaseLockedDesc}>
+                  Selesaikan{" "}
+                  {section.title.includes("Fase 2")
+                    ? "70% Fase 1"
+                    : "60% Fase 2"}{" "}
+                  untuk membuka!
+                </Text>
+              )}
+
+              {expandedPhases[phaseIndex] && (
+                <View style={styles.levelsContainer}>
+                  {section.data.map((item) => (
+                    <View key={item.id}>{renderLevelItem({ item })}</View>
+                  ))}
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
 
       {/* Mode Selection Dialog */}
       <Portal>
@@ -497,37 +583,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  mainScrollView: {
+    flex: 1,
+  },
   profileCard: {
-    marginHorizontal: "5%",
+    marginHorizontal: getContentPadding(),
+    marginTop: getResponsiveSpacing(10),
+    marginBottom: getResponsiveSpacing(12),
     maxWidth: 600,
     alignSelf: "center",
     width: "90%",
+    borderRadius: 20,
+  },
+  profileCardInner: {
     backgroundColor: "rgba(255,255,255,0.95)",
     borderRadius: 20,
-    marginBottom: 15,
     elevation: 8,
+    borderWidth: 2,
+    borderColor: "#26D0CE",
   },
   profileContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 8,
-  },
-  userInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    paddingHorizontal: 15,
+    paddingVertical: getResponsiveSpacing(12),
+    paddingHorizontal: getResponsiveSpacing(12),
   },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: getResponsiveFontSize(50),
+    height: getResponsiveFontSize(50),
+    borderRadius: getResponsiveFontSize(25),
     backgroundColor: "#1A2980",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
-    elevation: 3,
+    marginRight: getResponsiveSpacing(12),
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: "#26D0CE",
   },
   avatarInitial: {
     color: "#fff",
@@ -537,102 +629,164 @@ const styles = StyleSheet.create({
   scoreContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: getResponsiveSpacing(6),
   },
-  profileIconButton: {
-    padding: 10,
-    marginLeft: 8,
+  settingsButton: {
+    padding: getResponsiveSpacing(8),
+    marginLeft: getResponsiveSpacing(12),
+    borderRadius: 12,
+    backgroundColor: "rgba(26, 41, 128, 0.1)",
   },
   textWrap: {
     flex: 1,
   },
   welcomeText: {
-    fontSize: 18,
     fontWeight: "900",
     color: "#1A2980",
   },
   scoreText: {
-    fontSize: 11,
     color: "#4a4a4a",
     marginLeft: 4,
   },
   scoreBold: {
     fontWeight: "bold",
     color: "#FF9800",
-    fontSize: 14,
   },
-  logoutLabel: {
-    color: "#D32F2F",
+  quickAccessSection: {
+    marginHorizontal: getContentPadding(),
+    marginBottom: getResponsiveSpacing(15),
+    maxWidth: 800,
+    alignSelf: "center",
+    width: "90%",
+  },
+  challengeButton: {
+    borderRadius: 20,
+    overflow: "hidden",
+    elevation: 8,
+  },
+  challengeGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: getResponsiveSpacing(16),
+  },
+  challengeTextWrap: {
+    marginLeft: getResponsiveSpacing(12),
+    flex: 1,
+  },
+  challengeTitle: {
     fontWeight: "bold",
-    fontSize: 11,
+    color: "#FFF",
+    marginBottom: 2,
+  },
+  challengeDesc: {
+    color: "#FFE97D",
   },
   contentContainer: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.08)",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingTop: 15,
-    paddingHorizontal: 15,
-    marginHorizontal: "5%",
+    paddingTop: getResponsiveSpacing(18),
+    paddingHorizontal: getResponsiveSpacing(12),
+    marginHorizontal: getContentPadding(),
     maxWidth: 800,
     width: "90%",
     alignSelf: "center",
+    marginBottom: getResponsiveSpacing(20),
   },
   sectionTitle: {
     color: "#FFD700",
     fontWeight: "900",
-    fontSize: 16,
-    marginBottom: 12,
-    marginLeft: 5,
+    marginBottom: getResponsiveSpacing(14),
+    marginLeft: getResponsiveSpacing(6),
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
-  levelsWrapper: {
+  topButtonsContainer: {
+    flexDirection: "row",
+    gap: getResponsiveSpacing(12),
+    marginBottom: getResponsiveSpacing(20),
+    marginHorizontal: getResponsiveSpacing(6),
+  },
+  topButton: {
     flex: 1,
-    marginBottom: 10,
+    borderRadius: 16,
+    overflow: "hidden",
+    elevation: 6,
+    minHeight: getResponsiveFontSize(56),
+  },
+  topButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: getResponsiveSpacing(12),
+    gap: getResponsiveSpacing(8),
+  },
+  topButtonText: {
+    fontWeight: "bold",
+    color: "#26D0CE",
+    textAlign: "center",
+  },
+  phaseContainer: {
+    marginBottom: getResponsiveSpacing(10),
+  },
+  phaseHeaderTouchable: {
+    backgroundColor: "rgba(26, 41, 128, 0.85)",
+    borderRadius: 12,
+    paddingVertical: getResponsiveSpacing(10),
+    paddingHorizontal: getResponsiveSpacing(12),
+    marginBottom: getResponsiveSpacing(6),
+    elevation: 3,
+  },
+  phaseHeaderContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  phaseHeader: {
+    fontSize: getResponsiveFontSize(14),
+    fontWeight: "bold",
+    color: "#FFD700",
+    marginLeft: getResponsiveSpacing(8),
+    flex: 1,
+  },
+  phaseLockedDesc: {
+    color: "#ffcccc",
+    fontSize: getResponsiveFontSize(10),
+    marginLeft: getResponsiveSpacing(12),
+    marginBottom: getResponsiveSpacing(6),
+    fontStyle: "italic",
+    paddingHorizontal: getResponsiveSpacing(12),
+  },
+  levelsContainer: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 12,
+    paddingHorizontal: getResponsiveSpacing(4),
+    paddingVertical: getResponsiveSpacing(6),
+    marginBottom: getResponsiveSpacing(8),
   },
   listContainer: {
-    paddingBottom: 20,
-    paddingHorizontal: 5,
+    paddingBottom: getResponsiveSpacing(20),
+    paddingHorizontal: getResponsiveSpacing(4),
   },
   listItem: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 15,
-    marginBottom: 12,
+    marginBottom: getResponsiveSpacing(10),
     elevation: 4,
-    paddingVertical: 8,
+    paddingVertical: getResponsiveSpacing(8),
   },
   lockedItem: {
-    opacity: 0.7,
-    backgroundColor: "rgba(230, 230, 230, 0.95)",
-  },
-  phaseHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FFD700",
-    backgroundColor: "rgba(26, 41, 128, 0.9)",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    marginTop: 10,
-    marginBottom: 5,
-    elevation: 3,
-  },
-  phaseLockedDesc: {
-    color: "#ffcccc",
-    fontSize: 11,
-    marginLeft: 12,
-    marginBottom: 5,
-    fontStyle: "italic",
+    opacity: 0.6,
+    backgroundColor: "rgba(230, 230, 230, 0.9)",
   },
   itemTitle: {
     fontWeight: "900",
-    fontSize: 13,
+    fontSize: getResponsiveFontSize(13),
     color: "#1A2980",
   },
   itemDesc: {
     color: "#555",
-    fontSize: 11,
+    fontSize: getResponsiveFontSize(11),
   },
   iconContainer: {
     justifyContent: "center",
@@ -650,37 +804,34 @@ const styles = StyleSheet.create({
   iconLocked: {
     backgroundColor: "#9E9E9E",
   },
-  leaderboardButton: {
-    borderRadius: 15,
-    backgroundColor: "#1A2980",
-    elevation: 5,
-    marginBottom: 10,
-    marginTop: 10,
-    marginHorizontal: 5,
-    borderWidth: 2,
-    borderColor: "#26D0CE",
+  bottomButtonsContainer: {
+    flexDirection: "row",
+    gap: getResponsiveSpacing(12),
+    marginTop: getResponsiveSpacing(16),
+    marginBottom: getResponsiveSpacing(24),
+    marginHorizontal: getResponsiveSpacing(6),
+    paddingTop: getResponsiveSpacing(14),
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.2)",
   },
-  warehouseButton: {
-    borderRadius: 15,
-    backgroundColor: "#FF6B6B",
-    elevation: 5,
-    marginBottom: 20,
-    marginHorizontal: 5,
-    borderWidth: 2,
-    borderColor: "#FF8E72",
+  bottomButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+    elevation: 6,
+    minHeight: getResponsiveFontSize(56),
   },
-  buttonContent: {
-    paddingVertical: 10,
+  bottomButtonGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: getResponsiveSpacing(12),
+    gap: getResponsiveSpacing(8),
   },
-  buttonLabel: {
-    fontSize: 14,
+  bottomButtonText: {
     fontWeight: "bold",
     color: "#26D0CE",
-  },
-  warehouseLabel: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#FFF",
+    textAlign: "center",
   },
   dialogStyle: {
     backgroundColor: "#fff",
@@ -692,16 +843,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "900",
     color: "#1A2980",
-    fontSize: 16,
+    fontSize: getResponsiveFontSize(16),
   },
   dialogSub: {
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: getResponsiveSpacing(15),
     color: "#555",
-    fontSize: 13,
+    fontSize: getResponsiveFontSize(13),
   },
   modeCard: {
-    marginBottom: 12,
+    marginBottom: getResponsiveSpacing(12),
     borderRadius: 15,
     overflow: "hidden",
     elevation: 4,
@@ -709,20 +860,20 @@ const styles = StyleSheet.create({
   modeGradient: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
+    padding: getResponsiveSpacing(15),
   },
   modeTextWrap: {
-    marginLeft: 12,
+    marginLeft: getResponsiveSpacing(12),
     flex: 1,
   },
   modeTitle: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 14,
+    fontSize: getResponsiveFontSize(14),
   },
   modeDesc: {
     color: "#eee",
-    fontSize: 11,
+    fontSize: getResponsiveFontSize(11),
     marginTop: 2,
   },
 });
