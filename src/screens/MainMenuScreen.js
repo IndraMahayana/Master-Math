@@ -382,54 +382,6 @@ export default function MainMenuScreen({ route, navigation }) {
         </View>
 
         <View style={styles.contentContainer}>
-          <View style={styles.topButtonsContainer}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate("Leaderboard")}
-              style={styles.topButton}
-            >
-              <LinearGradient
-                colors={["#2196F3", "#1976D2"]}
-                style={styles.topButtonGradient}
-              >
-                <MaterialCommunityIcons name="trophy" size={24} color="#FFF" />
-                <Text
-                  style={[
-                    styles.topButtonText,
-                    { fontSize: getResponsiveFontSize(13) },
-                  ]}
-                >
-                  Papan Peringkat
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate("QuestionWarehouse")}
-              style={styles.topButton}
-            >
-              <LinearGradient
-                colors={["#FF6B6B", "#FF5252"]}
-                style={styles.topButtonGradient}
-              >
-                <MaterialCommunityIcons
-                  name="book-open-variant"
-                  size={24}
-                  color="#FFF"
-                />
-                <Text
-                  style={[
-                    styles.topButtonText,
-                    { fontSize: getResponsiveFontSize(13), color: "#FFF" },
-                  ]}
-                >
-                  Gudang Soal
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-
           <Title
             style={[
               styles.sectionTitle,

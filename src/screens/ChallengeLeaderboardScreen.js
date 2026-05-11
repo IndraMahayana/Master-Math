@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { List, Title, Card, Text } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
@@ -20,7 +26,10 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
     const fetchLeaderboard = async () => {
       setLoading(true);
       try {
-        const leaderboardsRef = collection(db, `challenge_leaderboards/${mode}/users`);
+        const leaderboardsRef = collection(
+          db,
+          `challenge_leaderboards/${mode}/users`,
+        );
         const q = query(leaderboardsRef, orderBy("score", "desc"), limit(20));
         const querySnapshot = await getDocs(q);
 
@@ -60,7 +69,8 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
           title={`${index + 1}. ${item.playerName}`}
           subtitle={
             <Text style={styles.scoreText}>
-              Skor: <Text style={styles.scoreNumber}>{item.score}</Text>  |  Max Streak: {item.streak}
+              Skor: <Text style={styles.scoreNumber}>{item.score}</Text> | Max
+              Streak: {item.streak}
             </Text>
           }
           left={(props) => (
@@ -96,13 +106,21 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
           style={[styles.tabButton, mode === "daily" && styles.activeTab]}
           onPress={() => setMode("daily")}
         >
-          <Text style={[styles.tabText, mode === "daily" && styles.activeTabText]}>Harian</Text>
+          <Text
+            style={[styles.tabText, mode === "daily" && styles.activeTabText]}
+          >
+            Harian
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, mode === "weekly" && styles.activeTab]}
           onPress={() => setMode("weekly")}
         >
-          <Text style={[styles.tabText, mode === "weekly" && styles.activeTabText]}>Mingguan</Text>
+          <Text
+            style={[styles.tabText, mode === "weekly" && styles.activeTabText]}
+          >
+            Mingguan
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -115,7 +133,9 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
       ) : (
         <View style={styles.listWrapper}>
           {leaderboard.length === 0 ? (
-             <Text style={styles.emptyText}>Belum ada data di papan peringkat ini.</Text>
+            <Text style={styles.emptyText}>
+              Belum ada data di papan peringkat ini.
+            </Text>
           ) : (
             <FlatList
               data={leaderboard}
@@ -211,5 +231,5 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.7)",
     marginTop: 30,
     fontStyle: "italic",
-  }
+  },
 });
