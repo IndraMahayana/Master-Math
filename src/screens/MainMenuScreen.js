@@ -280,7 +280,7 @@ export default function MainMenuScreen({ route, navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1A2980", "#26D0CE"]}
+      colors={["#1F1F1F", "#2A2A2A"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}
     >
       <ScrollView
@@ -337,7 +337,7 @@ export default function MainMenuScreen({ route, navigation }) {
                 onPress={() => navigation.navigate("Profile")}
                 style={styles.settingsButton}
               >
-                <MaterialCommunityIcons name="cog" size={24} color="#26D0CE" />
+                <MaterialCommunityIcons name="cog" size={24} color="#FF6B6B" />
               </TouchableOpacity>
             </Card.Content>
           </Card>
@@ -389,14 +389,10 @@ export default function MainMenuScreen({ route, navigation }) {
               style={styles.topButton}
             >
               <LinearGradient
-                colors={["#1A2980", "#0D1B4D"]}
+                colors={["#2196F3", "#1976D2"]}
                 style={styles.topButtonGradient}
               >
-                <MaterialCommunityIcons
-                  name="trophy"
-                  size={24}
-                  color="#26D0CE"
-                />
+                <MaterialCommunityIcons name="trophy" size={24} color="#FFF" />
                 <Text
                   style={[
                     styles.topButtonText,
@@ -596,11 +592,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   profileCardInner: {
-    backgroundColor: "rgba(255,255,255,0.95)",
-    borderRadius: 20,
-    elevation: 8,
-    borderWidth: 2,
-    borderColor: "#26D0CE",
+    backgroundColor: "rgba(255,255,255,0.98)",
+    borderRadius: 24,
+    elevation: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 107, 107, 0.4)",
+    shadowColor: "#1F1F1F",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
   profileContent: {
     flexDirection: "row",
@@ -613,13 +613,13 @@ const styles = StyleSheet.create({
     width: getResponsiveFontSize(50),
     height: getResponsiveFontSize(50),
     borderRadius: getResponsiveFontSize(25),
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
     marginRight: getResponsiveSpacing(12),
     elevation: 5,
     borderWidth: 2,
-    borderColor: "#26D0CE",
+    borderColor: "#FF6B6B",
   },
   avatarInitial: {
     color: "#fff",
@@ -642,11 +642,15 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontWeight: "900",
-    color: "#1A2980",
+    color: "#1F1F1F",
+    letterSpacing: 0.5,
+    fontSize: 16,
   },
   scoreText: {
-    color: "#4a4a4a",
-    marginLeft: 4,
+    color: "#555",
+    marginLeft: 6,
+    fontWeight: "600",
+    fontSize: 14,
   },
   scoreBold: {
     fontWeight: "bold",
@@ -694,11 +698,13 @@ const styles = StyleSheet.create({
     marginBottom: getResponsiveSpacing(20),
   },
   sectionTitle: {
-    color: "#FFD700",
+    color: "#FF6B6B",
     fontWeight: "900",
-    marginBottom: getResponsiveSpacing(14),
-    marginLeft: getResponsiveSpacing(6),
-    textShadowColor: "rgba(0,0,0,0.5)",
+    marginBottom: getResponsiveSpacing(16),
+    marginLeft: getResponsiveSpacing(8),
+    letterSpacing: 0.5,
+    fontSize: 18,
+    textShadowColor: "rgba(0,0,0,0.4)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
@@ -712,7 +718,11 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 16,
     overflow: "hidden",
-    elevation: 6,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     minHeight: getResponsiveFontSize(56),
   },
   topButtonGradient: {
@@ -723,20 +733,28 @@ const styles = StyleSheet.create({
     gap: getResponsiveSpacing(8),
   },
   topButtonText: {
-    fontWeight: "bold",
-    color: "#26D0CE",
+    fontWeight: "900",
+    color: "#FFF",
     textAlign: "center",
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
   phaseContainer: {
     marginBottom: getResponsiveSpacing(10),
   },
   phaseHeaderTouchable: {
-    backgroundColor: "rgba(26, 41, 128, 0.85)",
-    borderRadius: 12,
-    paddingVertical: getResponsiveSpacing(10),
-    paddingHorizontal: getResponsiveSpacing(12),
-    marginBottom: getResponsiveSpacing(6),
-    elevation: 3,
+    backgroundColor: "rgba(26, 41, 128, 0.9)",
+    borderRadius: 14,
+    paddingVertical: getResponsiveSpacing(12),
+    paddingHorizontal: getResponsiveSpacing(14),
+    marginBottom: getResponsiveSpacing(8),
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "rgba(38, 208, 206, 0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   phaseHeaderContent: {
     flexDirection: "row",
@@ -744,10 +762,11 @@ const styles = StyleSheet.create({
   },
   phaseHeader: {
     fontSize: getResponsiveFontSize(14),
-    fontWeight: "bold",
+    fontWeight: "900",
     color: "#FFD700",
-    marginLeft: getResponsiveSpacing(8),
+    marginLeft: getResponsiveSpacing(10),
     flex: 1,
+    letterSpacing: 0.3,
   },
   phaseLockedDesc: {
     color: "#ffcccc",
@@ -769,11 +788,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: getResponsiveSpacing(4),
   },
   listItem: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    borderRadius: 15,
-    marginBottom: getResponsiveSpacing(10),
-    elevation: 4,
-    paddingVertical: getResponsiveSpacing(8),
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    borderRadius: 16,
+    marginBottom: getResponsiveSpacing(11),
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "rgba(38, 208, 206, 0.15)",
+    paddingVertical: getResponsiveSpacing(10),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   lockedItem: {
     opacity: 0.6,
@@ -782,11 +807,13 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontWeight: "900",
     fontSize: getResponsiveFontSize(13),
-    color: "#1A2980",
+    color: "#1F1F1F",
+    letterSpacing: 0.2,
   },
   itemDesc: {
-    color: "#555",
+    color: "#666",
     fontSize: getResponsiveFontSize(11),
+    fontWeight: "500",
   },
   iconContainer: {
     justifyContent: "center",
@@ -830,7 +857,7 @@ const styles = StyleSheet.create({
   },
   bottomButtonText: {
     fontWeight: "bold",
-    color: "#26D0CE",
+    color: "#FFF",
     textAlign: "center",
   },
   dialogStyle: {
@@ -842,7 +869,7 @@ const styles = StyleSheet.create({
   dialogTitle: {
     textAlign: "center",
     fontWeight: "900",
-    color: "#1A2980",
+    color: "#FF6B6B",
     fontSize: getResponsiveFontSize(16),
   },
   dialogSub: {

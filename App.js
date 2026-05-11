@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { authStorage } from "./src/utils/authStorage";
 
 // Import Screens
 import LoginScreen from "./src/screens/LoginScreen";
@@ -27,8 +28,8 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "#1A2980",
-    accent: "#26D0CE",
+    primary: "#1F1F1F",
+    accent: "#FF6B6B",
   },
 };
 
@@ -187,11 +188,11 @@ function BottomTabNavigator() {
             <MaterialCommunityIcons name={iconName} size={24} color={color} />
           );
         },
-        tabBarActiveTintColor: "#1A2980",
+        tabBarActiveTintColor: "#FF6B6B",
         tabBarInactiveTintColor: "#999",
         tabBarStyle: {
           backgroundColor: "#fff",
-          borderTopColor: "#e0e0e0",
+          borderTopColor: "#ddd",
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
@@ -229,11 +230,66 @@ function BottomTabNavigator() {
 }
 
 export default function App() {
+  const [initialRoute, setInitialRoute] = useState(null);
+  const [initialState, setInitialState] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigationRef = React.useRef();
+
+  useEffect(() => {
+    // Cek apakah user sudah login sebelumnya
+    const checkAuthState = async () => {
+      try {
+        const authState = await authStorage.getAuthState();
+        const navState = await authStorage.getNavigationState();
+
+        if (authState && authState.uid) {
+          // User sudah login, restore ke app tabs
+          setInitialRoute("AppTabs");
+          setInitialState(navState);
+        } else {
+          // User belum login, go to login
+          setInitialRoute("Login");
+        }
+      } catch (error) {
+        console.error("Error checking auth state:", error);
+        setInitialRoute("Login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthState();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#f5f5f5",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="#1A2980" />
+        <Text style={{ fontSize: 16, color: "#666", marginTop: 10 }}>
+          Memuat...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
       <PaperProvider theme={theme}>
         <NavigationContainer
+          ref={navigationRef}
           linking={linking}
+          initialState={initialState}
+          onStateChange={async (state) => {
+            // Simpan navigation state setiap kali berubah
+            await authStorage.saveNavigationState(state);
+          }}
           fallback={
             <View
               style={{
@@ -248,7 +304,7 @@ export default function App() {
           }
         >
           <Stack.Navigator
-            initialRouteName="Login"
+            initialRouteName={initialRoute || "Login"}
             screenOptions={{
               headerStyle: { backgroundColor: "#1A2980" },
               headerTintColor: "#fff",

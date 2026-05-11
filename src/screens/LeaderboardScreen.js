@@ -97,7 +97,7 @@ export default function LeaderboardScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
+    <LinearGradient colors={["#1F1F1F", "#2A2A2A"]} style={styles.container}>
       <Title style={styles.title}>🏆 Top 10 Pemain 🏆</Title>
 
       {loading ? (
@@ -128,13 +128,14 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: "center",
-    marginVertical: 15,
-    fontSize: 26,
+    marginVertical: 16,
+    fontSize: 28,
     color: "#FFD700",
     fontWeight: "900",
-    textShadowColor: "rgba(0,0,0,0.5)",
+    letterSpacing: 1,
+    textShadowColor: "rgba(0,0,0,0.4)",
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 5,
+    textShadowRadius: 4,
   },
   listWrapper: {
     flex: 1,
@@ -144,29 +145,42 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   card: {
-    marginBottom: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    elevation: 5,
-    borderRadius: 15,
+    marginBottom: 13,
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    elevation: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 107, 107, 0.1)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   highlightedCard: {
-    backgroundColor: "#E0F7FA",
-    borderColor: "#26D0CE",
+    backgroundColor: "#FFE8E8",
+    borderColor: "#FF6B6B",
     borderWidth: 2,
-    transform: [{ scale: 1.02 }],
+    transform: [{ scale: 1.03 }],
+    elevation: 10,
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
   },
   cardTitle: {
-    fontWeight: "bold",
-    fontSize: 18,
-    color: "#1A2980",
+    fontWeight: "900",
+    fontSize: 16,
+    color: "#FF6B6B",
+    letterSpacing: 0.3,
   },
   scoreText: {
-    color: "#4a4a4a",
+    color: "#555",
     fontSize: 14,
+    fontWeight: "600",
   },
   scoreNumber: {
-    fontWeight: "bold",
-    color: "#1A2980",
+    fontWeight: "900",
+    color: "#FF9800",
     fontSize: 16,
   },
   highlightedText: {

@@ -502,7 +502,7 @@ export default function PracticeProblemsScreen({ route, navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1A2980", "#26D0CE"]}
+      colors={["#1F1F1F", "#2A2A2A"]}
       style={[styles.container, { paddingTop: Math.max(insets.top, 20) }]}
     >
       {/* Header */}
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
   problemQuestion: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#1A2980",
+    color: "#1F1F1F",
     textAlign: "center",
   },
   answerCard: {
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: "#F5F5F5",
     borderWidth: 2,
-    borderColor: "#1A2980",
+    borderColor: "#FF6B6B",
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -837,13 +837,13 @@ const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
     borderBottomWidth: 3,
-    borderBottomColor: "#1A2980",
+    borderBottomColor: "#FF6B6B",
     paddingVertical: 8,
   },
   inputText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#1A2980",
+    color: "#FF6B6B",
   },
   numberPad: {
     flexDirection: "row",
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
   numButton: {
     width: "31%",
     paddingVertical: 12,
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -864,7 +864,7 @@ const styles = StyleSheet.create({
     width: "31%",
   },
   dotButton: {
-    backgroundColor: "#26D0CE",
+    backgroundColor: "#2196F3",
   },
   deleteButton: {
     backgroundColor: "#FF6B6B",
@@ -881,7 +881,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     borderRadius: 12,
     elevation: 3,
   },
@@ -911,7 +911,7 @@ const styles = StyleSheet.create({
   solutionTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1A2980",
+    color: "#FF6B6B",
     marginBottom: 12,
   },
   stepContainer: {
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontWeight: "bold",
-    color: "#1A2980",
+    color: "#FF6B6B",
     fontSize: 12,
   },
   stepText: {
@@ -968,7 +968,7 @@ const styles = StyleSheet.create({
   },
   showAnswerButton: {
     borderRadius: 12,
-    borderColor: "#26D0CE",
+    borderColor: "#2196F3",
     borderWidth: 2,
     marginBottom: 15,
   },

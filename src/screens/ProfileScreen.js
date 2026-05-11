@@ -43,6 +43,7 @@ import {
   getDeviceType,
   getContentPadding,
 } from "../utils/responsiveUtils";
+import { authStorage } from "../utils/authStorage";
 
 export default function ProfileScreen({ navigation }) {
   const deviceType = getDeviceType();
@@ -171,12 +172,16 @@ export default function ProfileScreen({ navigation }) {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // Hapus auth state
+      await authStorage.clearAuthState();
       navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
       });
     } catch (error) {
       console.log("Error signing out: ", error);
+      // Tetap clear state walaupun ada error
+      await authStorage.clearAuthState();
       navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
@@ -187,7 +192,7 @@ export default function ProfileScreen({ navigation }) {
   if (loading) {
     return (
       <LinearGradient
-        colors={["#1A2980", "#26D0CE"]}
+        colors={["#1F1F1F", "#2A2A2A"]}
         style={styles.centerContainer}
       >
         <ActivityIndicator size="large" color="#fff" />
@@ -196,7 +201,7 @@ export default function ProfileScreen({ navigation }) {
   }
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
+    <LinearGradient colors={["#1F1F1F", "#2A2A2A"]} style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -234,12 +239,12 @@ export default function ProfileScreen({ navigation }) {
               onChangeText={setNewUsername}
               mode="outlined"
               style={styles.input}
-              activeOutlineColor="#1A2980"
+              activeOutlineColor="#FF6B6B"
               right={
                 <TextInput.Icon
                   icon="account-edit"
                   onPress={handleUpdateUsername}
-                  color="#1A2980"
+                  color="#FF6B6B"
                 />
               }
             />
@@ -263,7 +268,7 @@ export default function ProfileScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              activeOutlineColor="#1A2980"
+              activeOutlineColor="#FF6B6B"
             />
             <TextInput
               label="Password Baru"
@@ -272,7 +277,7 @@ export default function ProfileScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              activeOutlineColor="#1A2980"
+              activeOutlineColor="#FF6B6B"
             />
             <Button
               mode="contained"
@@ -304,7 +309,7 @@ export default function ProfileScreen({ navigation }) {
                     <List.Icon
                       {...props}
                       icon="gamepad-variant"
-                      color="#26D0CE"
+                      color="#FF6B6B"
                     />
                   )}
                   style={styles.historyItem}
@@ -348,10 +353,16 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   card: {
-    marginBottom: 15,
+    marginBottom: 16,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    elevation: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255, 107, 107, 0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   avatarSection: {
     alignItems: "center",
@@ -362,28 +373,33 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: "#26D0CE",
+    borderColor: "#FF6B6B",
   },
   avatarPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#1A2980",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: "#26D0CE",
+    borderColor: "rgba(255, 107, 107, 0.5)",
+    elevation: 8,
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
   },
   avatarInitial: {
-    fontSize: 40,
+    fontSize: 48,
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "900",
   },
   editBadge: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 15,
@@ -396,35 +412,47 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   usernameTitle: {
-    marginTop: 15,
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#1A2980",
+    marginTop: 16,
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#FF6B6B",
+    letterSpacing: 0.5,
   },
   emailSubtitle: {
     color: "#666",
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 12,
+    fontWeight: "500",
   },
   scoreBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#1A2980",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: "#FF6B6B",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
-    marginTop: 5,
+    marginTop: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255, 107, 107, 0.3)",
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   scoreBadgeText: {
     color: "#FFD700",
-    fontWeight: "bold",
-    marginLeft: 5,
+    fontWeight: "900",
+    marginLeft: 6,
+    letterSpacing: 0.2,
   },
   sectionTitle: {
-    margin: 15,
-    marginBottom: 0,
-    fontWeight: "bold",
-    color: "#1A2980",
+    margin: 16,
+    marginBottom: 10,
+    fontWeight: "900",
+    color: "#FF6B6B",
+    fontSize: 16,
+    letterSpacing: 0.3,
   },
   input: {
     marginBottom: 10,

@@ -579,7 +579,7 @@ export default function GameplayScreen({ route, navigation }) {
                   disabled={gameOver}
                 >
                   <LinearGradient
-                    colors={["#1A2980", "#26D0CE"]}
+                    colors={["#FF6B6B", "#E63946"]}
                     style={styles.optionGradient}
                     start={[0, 0]}
                     end={[1, 1]}
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
   },
   levelTitle: {
     textAlign: "center",
-    color: "#1A2980",
+    color: "#1F1F1F",
     marginBottom: 12,
     fontWeight: "900",
     fontSize: 13,

@@ -145,7 +145,7 @@ export default function QuestionWarehouseScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1A2980", "#26D0CE"]}
+      colors={["#1F1F1F", "#2A2A2A"]}
       style={[styles.container, { paddingTop: Math.max(insets.top, 20) }]}
     >
       {/* Header */}
@@ -165,6 +165,8 @@ export default function QuestionWarehouseScreen({ navigation }) {
         style={styles.contentContainer}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
       >
         <Text style={styles.subtitle}>
           Pilih kategori soal untuk melatih kemampuan matematikamu:
@@ -180,7 +182,7 @@ export default function QuestionWarehouseScreen({ navigation }) {
               <MaterialCommunityIcons
                 name="information-outline"
                 size={20}
-                color="#1A2980"
+                color="#FF6B6B"
                 style={styles.infoIcon}
               />
               <Text style={styles.infoText}>

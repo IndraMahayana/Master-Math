@@ -88,7 +88,7 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
   };
 
   return (
-    <LinearGradient colors={["#1A2980", "#26D0CE"]} style={styles.container}>
+    <LinearGradient colors={["#1F1F1F", "#2A2A2A"]} style={styles.container}>
       <Title style={styles.title}>🏆 Leaderboard Tantangan 🏆</Title>
 
       <View style={styles.tabContainer}>
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   activeTabText: {
-    color: "#1A2980",
+    color: "#FF6B6B",
   },
   listWrapper: {
     flex: 1,
@@ -184,15 +184,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   highlightedCard: {
-    backgroundColor: "#E0F7FA",
-    borderColor: "#26D0CE",
+    backgroundColor: "#FFE8E8",
+    borderColor: "#FF6B6B",
     borderWidth: 2,
     transform: [{ scale: 1.02 }],
   },
   cardTitle: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "#1A2980",
+    color: "#FF6B6B",
   },
   scoreText: {
     color: "#4a4a4a",
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   scoreNumber: {
     fontWeight: "bold",
-    color: "#1A2980",
+    color: "#FF6B6B",
     fontSize: 16,
   },
   highlightedText: {

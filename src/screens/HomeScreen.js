@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1A2980", "#26D0CE"]}
+      colors={["#1F1F1F", "#2A2A2A"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 20) }]}
     >
       <ScrollView
@@ -135,7 +135,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("MainMenu")}
         >
           <LinearGradient
-            colors={["#667eea", "#764ba2"]}
+            colors={["#2196F3", "#1976D2"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.menuCard}
@@ -168,7 +168,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("ChallengeMenu")}
         >
           <LinearGradient
-            colors={["#f093fb", "#f5576c"]}
+            colors={["#FF6B6B", "#E63946"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.menuCard}
@@ -250,31 +250,45 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     marginBottom: 25,
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    elevation: 8,
+    borderRadius: 24,
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 107, 107, 0.3)",
+    elevation: 10,
+    shadowColor: "#1F1F1F",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
   },
   welcomeContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatarSmall: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#1A2980",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
-    elevation: 4,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: "rgba(255, 107, 107, 0.4)",
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   welcomeText: {
     flex: 1,
   },
   welcomeTitle: {
-    fontWeight: "bold",
-    color: "#1A2980",
+    fontWeight: "900",
+    color: "#1F1F1F",
     marginBottom: 8,
+    letterSpacing: 0.3,
+    fontSize: 20,
   },
   scoreRow: {
     flexDirection: "row",
@@ -282,59 +296,72 @@ const styles = StyleSheet.create({
   },
   scoreTextWelcome: {
     fontSize: 12,
-    color: "#555",
+    color: "#666",
+    fontWeight: "500",
   },
   scoreBold: {
-    fontWeight: "bold",
+    fontWeight: "900",
     color: "#FF9800",
     fontSize: 14,
   },
   menuTitle: {
-    color: "#FFD700",
+    color: "#FF6B6B",
     fontWeight: "900",
-    marginBottom: 12,
+    marginBottom: 15,
     marginLeft: 5,
-    textShadowColor: "rgba(0,0,0,0.5)",
+    letterSpacing: 0.5,
+    fontSize: 16,
+    textShadowColor: "rgba(0,0,0,0.4)",
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
   menuCard: {
     borderRadius: 20,
     marginBottom: 15,
     overflow: "hidden",
-    elevation: 8,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
   },
   menuCardContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 18,
+    padding: 20,
   },
   iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "rgba(255,255,255,0.25)",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.4)",
   },
   menuTextContent: {
     flex: 1,
   },
   menuTitle2: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "900",
     fontSize: 16,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
   menuDescription: {
     color: "#fff",
     fontSize: 12,
     marginBottom: 4,
+    fontWeight: "500",
   },
   menuSubtitle: {
-    color: "rgba(255,255,255,0.7)",
-    fontSize: 10,
+    color: "rgba(255,255,255,0.8)",
+    fontSize: 11,
+    fontWeight: "400",
+    letterSpacing: 0.2,
   },
   infoGrid: {
     flexDirection: "row",
@@ -344,24 +371,32 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     flex: 1,
-    borderRadius: 15,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    elevation: 4,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255, 107, 107, 0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   infoContent: {
     alignItems: "center",
-    padding: 12,
+    padding: 14,
   },
   infoTitle: {
-    fontWeight: "bold",
-    color: "#1A2980",
+    fontWeight: "900",
+    color: "#1F1F1F",
     marginTop: 8,
     fontSize: 13,
+    letterSpacing: 0.3,
   },
   infoText: {
-    color: "#666",
+    color: "#888",
     fontSize: 10,
     textAlign: "center",
-    marginTop: 2,
+    marginTop: 4,
+    fontWeight: "400",
   },
 });

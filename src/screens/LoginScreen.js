@@ -28,6 +28,7 @@ import {
   getDeviceType,
   getResponsiveElevation,
 } from "../utils/responsiveUtils";
+import { authStorage } from "../utils/authStorage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -84,6 +85,14 @@ export default function LoginScreen({ navigation }) {
             playerName = userDoc.data().username || playerName;
             currentScore = userDoc.data().score || 0;
           }
+
+          // Simpan auth state
+          await authStorage.saveAuthState({
+            uid: user.uid,
+            email: user.email,
+            username: playerName,
+            score: currentScore,
+          });
 
           setLoading(false);
           navigation.reset({
@@ -149,6 +158,14 @@ export default function LoginScreen({ navigation }) {
         console.log("Firestore fetch error on login", dbError);
       }
 
+      // Simpan auth state
+      await authStorage.saveAuthState({
+        uid: user.uid,
+        email: user.email,
+        username: playerName,
+        score: currentScore,
+      });
+
       navigation.reset({
         index: 0,
         routes: [
@@ -180,7 +197,7 @@ export default function LoginScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
-          colors={["#1A2980", "#26D0CE"]}
+          colors={["#1F1F1F", "#2A2A2A"]}
           style={styles.gradientContainer}
         >
           <View style={[styles.card, { width: responsiveStyles.cardWidth }]}>
@@ -224,8 +241,8 @@ export default function LoginScreen({ navigation }) {
               keyboardType="email-address"
               autoCapitalize="none"
               outlineColor="#e0e0e0"
-              activeOutlineColor="#26D0CE"
-              left={<TextInput.Icon icon="email" color="#1A2980" />}
+              activeOutlineColor="#FF6B6B"
+              left={<TextInput.Icon icon="email" color="#FF6B6B" />}
             />
 
             <TextInput
@@ -239,12 +256,12 @@ export default function LoginScreen({ navigation }) {
               mode="outlined"
               secureTextEntry={!showPassword}
               outlineColor="#e0e0e0"
-              activeOutlineColor="#26D0CE"
-              left={<TextInput.Icon icon="lock" color="#1A2980" />}
+              activeOutlineColor="#FF6B6B"
+              left={<TextInput.Icon icon="lock" color="#FF6B6B" />}
               right={
                 <TextInput.Icon
                   icon={showPassword ? "eye-off" : "eye"}
-                  color="#1A2980"
+                  color="#FF6B6B"
                   onPress={() => setShowPassword(!showPassword)}
                 />
               }
@@ -330,58 +347,74 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   card: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
     padding: 30,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 107, 107, 0.3)",
+    elevation: 12,
+    shadowColor: "#1F1F1F",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
   },
   title: {
     fontWeight: "900",
     textAlign: "center",
-    color: "#1A2980",
-    marginBottom: 5,
+    color: "#1F1F1F",
+    marginBottom: 8,
+    letterSpacing: 1,
+    fontSize: 36,
   },
   subtitle: {
     textAlign: "center",
-    marginBottom: 25,
+    marginBottom: 28,
     color: "#4a4a4a",
+    fontWeight: "500",
+    letterSpacing: 0.3,
   },
   input: {
     backgroundColor: "#fff",
   },
   button: {
-    borderRadius: 15,
-    backgroundColor: "#1A2980",
-    elevation: 4,
+    borderRadius: 16,
+    backgroundColor: "#FF6B6B",
+    elevation: 6,
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
   googleButton: {
     backgroundColor: "#fff",
-    borderColor: "#D32F2F",
-    borderWidth: 1.5,
-    elevation: 0,
+    borderColor: "#2196F3",
+    borderWidth: 2,
+    elevation: 3,
+    shadowColor: "#2196F3",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
   },
   guestButton: {
-    marginTop: 5,
+    marginTop: 8,
   },
   buttonContent: {
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   divider: {
     textAlign: "center",
-    marginVertical: 10,
+    marginVertical: 16,
     color: "#757575",
-    fontWeight: "bold",
+    fontWeight: "600",
+    letterSpacing: 0.5,
+    fontSize: 12,
   },
   linkContainer: {
-    marginTop: 15,
+    marginTop: 20,
     alignItems: "center",
   },
   linkText: {
-    color: "#1A2980",
+    color: "#FF6B6B",
     fontSize: 14,
   },
   linkTextBold: {
@@ -389,18 +422,21 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   logoBadge: {
-    width: 60,
-    height: 60,
-    borderRadius: 15,
-    backgroundColor: "#1A2980",
+    width: 70,
+    height: 70,
+    borderRadius: 20,
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#1A2980",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    borderWidth: 2,
+    borderColor: "rgba(255, 107, 107, 0.4)",
+    shadowColor: "#FF6B6B",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });

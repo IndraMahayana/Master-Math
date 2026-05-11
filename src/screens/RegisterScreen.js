@@ -28,6 +28,7 @@ import {
   getDeviceType,
   getResponsiveElevation,
 } from "../utils/responsiveUtils";
+import { authStorage } from "../utils/authStorage";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -85,6 +86,15 @@ export default function RegisterScreen({ navigation }) {
             username: user.displayName || user.email.split("@")[0],
             score: 0,
           };
+
+          // Simpan auth state
+          await authStorage.saveAuthState({
+            uid: user.uid,
+            email: user.email,
+            username: userData.username,
+            score: userData.score,
+          });
+
           navigation.reset({
             index: 0,
             routes: [
@@ -150,6 +160,14 @@ export default function RegisterScreen({ navigation }) {
         createdAt: new Date(),
       });
 
+      // Simpan auth state
+      await authStorage.saveAuthState({
+        uid: user.uid,
+        email: email,
+        username: username,
+        score: 0,
+      });
+
       // Tujuan Point 2: Setelah register berhasil langsung redirect ke menu login
       Alert.alert("Sukses", "Akun berhasil dibuat!", [
         { text: "Masuk Sekarang", onPress: () => navigation.replace("Login") },
@@ -172,7 +190,7 @@ export default function RegisterScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
-          colors={["#1A2980", "#26D0CE"]}
+          colors={["#1F1F1F", "#2A2A2A"]}
           style={styles.gradientContainer}
         >
           <View style={[styles.card, { width: responsiveStyles.cardWidth }]}>
@@ -215,8 +233,8 @@ export default function RegisterScreen({ navigation }) {
               mode="outlined"
               autoCapitalize="words"
               outlineColor="#e0e0e0"
-              activeOutlineColor="#26D0CE"
-              left={<TextInput.Icon icon="account" color="#1A2980" />}
+              activeOutlineColor="#FF6B6B"
+              left={<TextInput.Icon icon="account" color="#FF6B6B" />}
             />
 
             <TextInput
@@ -231,8 +249,8 @@ export default function RegisterScreen({ navigation }) {
               keyboardType="email-address"
               autoCapitalize="none"
               outlineColor="#e0e0e0"
-              activeOutlineColor="#26D0CE"
-              left={<TextInput.Icon icon="email" color="#1A2980" />}
+              activeOutlineColor="#FF6B6B"
+              left={<TextInput.Icon icon="email" color="#FF6B6B" />}
             />
 
             <TextInput
@@ -246,12 +264,12 @@ export default function RegisterScreen({ navigation }) {
               mode="outlined"
               secureTextEntry={!showPassword}
               outlineColor="#e0e0e0"
-              activeOutlineColor="#26D0CE"
-              left={<TextInput.Icon icon="lock" color="#1A2980" />}
+              activeOutlineColor="#FF6B6B"
+              left={<TextInput.Icon icon="lock" color="#FF6B6B" />}
               right={
                 <TextInput.Icon
                   icon={showPassword ? "eye-off" : "eye"}
-                  color="#1A2980"
+                  color="#FF6B6B"
                   onPress={() => setShowPassword(!showPassword)}
                 />
               }
@@ -337,7 +355,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "900",
     textAlign: "center",
-    color: "#1A2980",
+    color: "#FF6B6B",
     marginBottom: 5,
   },
   subtitle: {
@@ -350,7 +368,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 15,
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     elevation: 5,
   },
   googleButton: {
@@ -372,7 +390,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   linkText: {
-    color: "#1A2980",
+    color: "#FF6B6B",
     fontSize: 14,
   },
   linkTextBold: {
@@ -386,10 +404,10 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 15,
-    backgroundColor: "#1A2980",
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#1A2980",
+    shadowColor: "#FF6B6B",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
