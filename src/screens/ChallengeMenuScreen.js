@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Text, Title, Card } from "react-native-paper";
+import { Text, Card } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,7 +20,7 @@ export default function ChallengeMenuScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1F1F1F", "#2A2A2A"]}
+      colors={["#0F2027", "#203A43", "#2C5364"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}
     >
       <View style={styles.header}>
@@ -30,7 +30,7 @@ export default function ChallengeMenuScreen({ navigation }) {
         >
           <MaterialCommunityIcons name="arrow-left" size={28} color="#FFF" />
         </TouchableOpacity>
-        <Title style={styles.title}>Arena Tantangan 🔥</Title>
+        <Text style={styles.title}>Arena Tantangan 🔥</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -91,10 +91,15 @@ export default function ChallengeMenuScreen({ navigation }) {
         <Card style={styles.card}>
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => navigation.navigate("ChallengeLeaderboard")}
+            onPress={() =>
+              navigation.navigate("LeaderboardTab", {
+                screen: "LeaderboardScreen",
+                params: { defaultTab: "challenge" },
+              })
+            }
           >
             <LinearGradient
-              colors={["#F2994A", "#F2C94C"]}
+              colors={["#D4AF37", "#FFD700"]}
               style={styles.cardGradient}
             >
               <MaterialCommunityIcons
@@ -132,8 +137,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFF",
+    fontWeight: "900",
+    color: "#FFFFFF",
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -141,16 +149,20 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 20,
-    borderRadius: 15,
-    elevation: 6,
+    borderRadius: 20,
+    elevation: 8,
     overflow: "hidden",
-    backgroundColor: "transparent",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
   },
   cardGradient: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
-    borderRadius: 15,
+    padding: 22,
   },
   cardTextWrap: {
     marginLeft: 15,

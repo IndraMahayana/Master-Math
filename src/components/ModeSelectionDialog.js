@@ -98,18 +98,20 @@ export default function ModeSelectionDialog({
 
 const styles = StyleSheet.create({
   dialogStyle: {
-    backgroundColor: "#FFF",
+    backgroundColor: "#1E293B",
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
   },
   dialogTitle: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#1F1F1F",
+    color: "#FFFFFF",
   },
   dialogSub: {
     textAlign: "center",
     marginBottom: 20,
-    color: "#666",
+    color: "rgba(255,255,255,0.7)",
   },
   modeCard: {
     marginBottom: 12,

@@ -6,20 +6,25 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { List, Title, Card, Text } from "react-native-paper";
+import { List, Card, Text } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function ChallengeLeaderboardScreen({ route, navigation }) {
+export default function ChallengeLeaderboardScreen({ route, navigation, isComponent }) {
+  useEffect(() => {
+    if (!isComponent) {
+      // Jika diakses dari rute mandiri (cache lama), redirect ke LeaderboardScreen baru
+      navigation.replace("LeaderboardScreen", { defaultTab: "challenge" });
+    }
+  }, [isComponent, navigation]);
+
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState("daily"); // "daily" or "weekly"
 
-  const currentUserEmail = auth.currentUser
-    ? auth.currentUser.email
-    : "Guest@guest.com";
+  const currentUserEmail = auth.currentUser?.email || "Guest@guest.com";
   const currentUser = currentUserEmail.split("@")[0];
 
   useEffect(() => {
@@ -97,9 +102,9 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
     );
   };
 
-  return (
-    <LinearGradient colors={["#1F1F1F", "#2A2A2A"]} style={styles.container}>
-      <Title style={styles.title}>🏆 Leaderboard Tantangan 🏆</Title>
+  const content = (
+    <>
+      <Text style={styles.title}>🏆 Peringkat Tantangan 🏆</Text>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -147,11 +152,25 @@ export default function ChallengeLeaderboardScreen({ route, navigation }) {
           )}
         </View>
       )}
-    </LinearGradient>
+    </>
   );
+
+  if (!isComponent) {
+    // Tampilkan loader selagi redirect
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center", backgroundColor: "#0F2027" }]}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
+    );
+  }
+
+  return <View style={styles.componentContainer}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
+  componentContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     paddingTop: 20,
@@ -171,8 +190,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 20,
     marginBottom: 15,
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
     overflow: "hidden",
   },
   tabButton: {
@@ -181,14 +202,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#FFD700",
+    backgroundColor: "rgba(212, 175, 55, 0.2)",
   },
   tabText: {
-    color: "#FFF",
+    color: "rgba(255, 255, 255, 0.6)",
     fontWeight: "bold",
   },
   activeTabText: {
-    color: "#FF6B6B",
+    color: "#FFD700",
   },
   listWrapper: {
     flex: 1,
@@ -199,32 +220,38 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    elevation: 5,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    elevation: 0,
     borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
   },
   highlightedCard: {
-    backgroundColor: "#FFE8E8",
-    borderColor: "#FF6B6B",
+    backgroundColor: "rgba(212, 175, 55, 0.15)",
+    borderColor: "#FFD700",
     borderWidth: 2,
     transform: [{ scale: 1.02 }],
+    shadowColor: "#FFD700",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   cardTitle: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "#FF6B6B",
+    color: "#E0E0E0",
   },
   scoreText: {
-    color: "#4a4a4a",
+    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
   },
   scoreNumber: {
     fontWeight: "bold",
-    color: "#FF6B6B",
+    color: "#FFD700",
     fontSize: 16,
   },
   highlightedText: {
-    color: "#00838F",
+    color: "#FFFFFF",
   },
   emptyText: {
     textAlign: "center",

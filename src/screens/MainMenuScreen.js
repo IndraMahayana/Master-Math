@@ -194,7 +194,7 @@ export default function MainMenuScreen({ route, navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1F1F1F", "#2A2A2A"]}
+      colors={["#0F2027", "#203A43", "#2C5364"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 40) }]}
     >
       <ScrollView
