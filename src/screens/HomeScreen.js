@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={["#1F1F1F", "#2A2A2A"]}
+      colors={["#0F2027", "#203A43", "#2C5364"]}
       style={[styles.container, { paddingTop: Math.max(insets.top + 10, 20) }]}
     >
       <ScrollView
@@ -135,7 +135,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("MainMenu")}
         >
           <LinearGradient
-            colors={["#2196F3", "#1976D2"]}
+            colors={["#4A00E0", "#8E2DE2"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.menuCard}
@@ -168,7 +168,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("ChallengeMenu")}
         >
           <LinearGradient
-            colors={["#FF6B6B", "#E63946"]}
+            colors={["#FF416C", "#FF4B2B"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.menuCard}
@@ -251,14 +251,14 @@ const styles = StyleSheet.create({
   welcomeCard: {
     marginBottom: 25,
     borderRadius: 24,
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1.5,
-    borderColor: "rgba(255, 107, 107, 0.3)",
-    elevation: 10,
-    shadowColor: "#1F1F1F",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    elevation: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
   },
   welcomeContent: {
     flexDirection: "row",
@@ -268,16 +268,16 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
-    elevation: 6,
-    borderWidth: 2,
-    borderColor: "rgba(255, 107, 107, 0.4)",
-    shadowColor: "#FF6B6B",
+    elevation: 0,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   welcomeText: {
@@ -285,10 +285,13 @@ const styles = StyleSheet.create({
   },
   welcomeTitle: {
     fontWeight: "900",
-    color: "#1F1F1F",
+    color: "#FFFFFF",
     marginBottom: 8,
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
     fontSize: 20,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   scoreRow: {
     flexDirection: "row",
@@ -296,22 +299,25 @@ const styles = StyleSheet.create({
   },
   scoreTextWelcome: {
     fontSize: 12,
-    color: "#666",
+    color: "rgba(255, 255, 255, 0.7)",
     fontWeight: "500",
   },
   scoreBold: {
     fontWeight: "900",
-    color: "#FF9800",
+    color: "#FFD700",
     fontSize: 14,
+    textShadowColor: "rgba(255, 215, 0, 0.4)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   menuTitle: {
-    color: "#FF6B6B",
+    color: "#E0E0E0",
     fontWeight: "900",
     marginBottom: 15,
     marginLeft: 5,
     letterSpacing: 0.5,
     fontSize: 16,
-    textShadowColor: "rgba(0,0,0,0.4)",
+    textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
@@ -319,11 +325,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 15,
     overflow: "hidden",
-    elevation: 10,
+    elevation: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
   },
   menuCardContent: {
     flexDirection: "row",
@@ -334,12 +342,12 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: "rgba(255,255,255,0.15)",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.4)",
+    borderColor: "rgba(255,255,255,0.25)",
   },
   menuTextContent: {
     flex: 1,
@@ -352,13 +360,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   menuDescription: {
-    color: "#fff",
+    color: "rgba(255,255,255,0.9)",
     fontSize: 12,
     marginBottom: 4,
     fontWeight: "500",
   },
   menuSubtitle: {
-    color: "rgba(255,255,255,0.8)",
+    color: "rgba(255,255,255,0.6)",
     fontSize: 11,
     fontWeight: "400",
     letterSpacing: 0.2,
@@ -372,13 +380,13 @@ const styles = StyleSheet.create({
   infoCard: {
     flex: 1,
     borderRadius: 18,
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
-    elevation: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    elevation: 0,
     borderWidth: 1,
-    borderColor: "rgba(255, 107, 107, 0.2)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
   },
   infoContent: {
@@ -387,16 +395,16 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontWeight: "900",
-    color: "#1F1F1F",
+    color: "#E0E0E0",
     marginTop: 8,
     fontSize: 13,
     letterSpacing: 0.3,
   },
   infoText: {
-    color: "#888",
+    color: "rgba(255, 255, 255, 0.5)",
     fontSize: 10,
     textAlign: "center",
     marginTop: 4,
-    fontWeight: "400",
+    fontWeight: "500",
   },
 });
