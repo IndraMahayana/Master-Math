@@ -12,7 +12,6 @@ import {
   Text,
   TextInput,
   Button,
-  Title,
   Card,
   List,
   ActivityIndicator,
@@ -192,16 +191,16 @@ export default function ProfileScreen({ navigation }) {
   if (loading) {
     return (
       <LinearGradient
-        colors={["#1F1F1F", "#2A2A2A"]}
+        colors={["#0F2027", "#203A43", "#2C5364"]}
         style={styles.centerContainer}
       >
-        <ActivityIndicator size="large" color="#fff" />
+        <ActivityIndicator size="large" color="#FFD700" />
       </LinearGradient>
     );
   }
 
   return (
-    <LinearGradient colors={["#1F1F1F", "#2A2A2A"]} style={styles.container}>
+    <LinearGradient colors={["#0F2027", "#203A43", "#2C5364"]} style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -219,7 +218,7 @@ export default function ProfileScreen({ navigation }) {
                 </View>
               )}
             </View>
-            <Title style={styles.usernameTitle}>{username}</Title>
+            <Text style={styles.usernameTitle}>{username}</Text>
             <Text style={styles.emailSubtitle}>{auth.currentUser?.email}</Text>
             <View style={styles.scoreBadge}>
               <MaterialCommunityIcons name="star" size={16} color="#FFD700" />
@@ -231,7 +230,7 @@ export default function ProfileScreen({ navigation }) {
         </Card>
 
         <Card style={styles.card}>
-          <Title style={styles.sectionTitle}>Pengaturan Akun</Title>
+          <Text style={styles.sectionTitle}>Pengaturan Akun</Text>
           <Card.Content>
             <TextInput
               label="Username Baru"
@@ -239,12 +238,14 @@ export default function ProfileScreen({ navigation }) {
               onChangeText={setNewUsername}
               mode="outlined"
               style={styles.input}
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFD700"
+              textColor="#FFF"
+              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
               right={
                 <TextInput.Icon
                   icon="account-edit"
                   onPress={handleUpdateUsername}
-                  color="#FF6B6B"
+                  color="#FFD700"
                 />
               }
             />
@@ -254,6 +255,8 @@ export default function ProfileScreen({ navigation }) {
                 onPress={handleUpdateUsername}
                 loading={actionLoading}
                 style={styles.actionButton}
+                buttonColor="#FFD700"
+                textColor="#000"
               >
                 Simpan Username
               </Button>
@@ -268,7 +271,9 @@ export default function ProfileScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFD700"
+              textColor="#FFF"
+              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
             />
             <TextInput
               label="Password Baru"
@@ -277,14 +282,17 @@ export default function ProfileScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
               style={styles.input}
-              activeOutlineColor="#FF6B6B"
+              activeOutlineColor="#FFD700"
+              textColor="#FFF"
+              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
             />
             <Button
               mode="contained"
               onPress={handleChangePassword}
               loading={actionLoading}
               style={styles.actionButton}
-              color="#FF9800"
+              buttonColor="#D4AF37"
+              textColor="#000"
             >
               Ganti Password
             </Button>
@@ -292,14 +300,16 @@ export default function ProfileScreen({ navigation }) {
         </Card>
 
         <Card style={styles.card}>
-          <Title style={styles.sectionTitle}>Riwayat Permainan</Title>
+          <Text style={styles.sectionTitle}>Riwayat Permainan</Text>
           <Card.Content>
             {history.length > 0 ? (
               history.map((game, i) => (
                 <List.Item
                   key={i}
                   title={game.levelTitle}
+                  titleStyle={styles.historyTitle}
                   description={new Date(game.date).toLocaleString("id-ID")}
+                  descriptionStyle={styles.historyDesc}
                   right={(props) => (
                     <Text {...props} style={styles.scoreText}>
                       {game.score} Pts
@@ -309,7 +319,7 @@ export default function ProfileScreen({ navigation }) {
                     <List.Icon
                       {...props}
                       icon="gamepad-variant"
-                      color="#FF6B6B"
+                      color="#FFD700"
                     />
                   )}
                   style={styles.historyItem}
@@ -328,7 +338,8 @@ export default function ProfileScreen({ navigation }) {
             <Button
               mode="contained"
               onPress={handleLogout}
-              style={[styles.actionButton, { backgroundColor: "#FF6B6B" }]}
+              style={[styles.actionButton, { backgroundColor: "rgba(255, 65, 108, 0.8)" }]}
+              textColor="#FFF"
             >
               Keluar (Logout)
             </Button>
@@ -355,14 +366,10 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 16,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
-    elevation: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    elevation: 0,
     borderWidth: 1,
-    borderColor: "rgba(255, 107, 107, 0.2)",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    borderColor: "rgba(255, 255, 255, 0.15)",
   },
   avatarSection: {
     alignItems: "center",
@@ -373,22 +380,17 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: "#FF6B6B",
+    borderColor: "#FFD700",
   },
   avatarPlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "rgba(212, 175, 55, 0.2)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: "rgba(255, 107, 107, 0.5)",
-    elevation: 8,
-    shadowColor: "#FF6B6B",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    borderColor: "#FFD700",
   },
   avatarInitial: {
     fontSize: 48,
@@ -415,11 +417,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 24,
     fontWeight: "900",
-    color: "#FF6B6B",
+    color: "#FFD700",
     letterSpacing: 0.5,
   },
   emailSubtitle: {
-    color: "#666",
+    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 14,
     marginBottom: 12,
     fontWeight: "500",
@@ -427,18 +429,13 @@ const styles = StyleSheet.create({
   scoreBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "rgba(212, 175, 55, 0.15)",
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     marginTop: 8,
-    elevation: 4,
     borderWidth: 1,
-    borderColor: "rgba(255, 107, 107, 0.3)",
-    shadowColor: "#FF6B6B",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    borderColor: "#FFD700",
   },
   scoreBadgeText: {
     color: "#FFD700",
@@ -450,13 +447,13 @@ const styles = StyleSheet.create({
     margin: 16,
     marginBottom: 10,
     fontWeight: "900",
-    color: "#FF6B6B",
+    color: "#FFD700",
     fontSize: 16,
     letterSpacing: 0.3,
   },
   input: {
     marginBottom: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "transparent",
   },
   actionButton: {
     marginTop: 5,
@@ -465,23 +462,30 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#ccc",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     marginVertical: 15,
   },
   historyItem: {
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
     paddingVertical: 5,
+  },
+  historyTitle: {
+    color: "#E0E0E0",
+    fontWeight: "bold",
+  },
+  historyDesc: {
+    color: "rgba(255, 255, 255, 0.5)",
   },
   scoreText: {
     alignSelf: "center",
     fontWeight: "bold",
-    color: "#FF9800",
+    color: "#FFD700",
     fontSize: 16,
   },
   emptyHistory: {
     textAlign: "center",
-    color: "#888",
+    color: "rgba(255, 255, 255, 0.5)",
     marginVertical: 20,
     fontStyle: "italic",
   },

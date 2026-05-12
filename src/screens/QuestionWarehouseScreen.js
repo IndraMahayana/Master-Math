@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -15,6 +15,7 @@ const { width } = Dimensions.get("window");
 
 export default function QuestionWarehouseScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const [isGridView, setIsGridView] = useState(false);
 
   const categories = [
     {
@@ -128,24 +129,28 @@ export default function QuestionWarehouseScreen({ navigation }) {
       key={category.id}
       activeOpacity={0.8}
       onPress={() => handleSelectCategory(category)}
-      style={styles.cardWrapper}
+      style={[styles.cardWrapper, isGridView && styles.cardWrapperGrid]}
     >
-      <LinearGradient colors={category.gradient} style={styles.categoryCard}>
-        <View style={styles.cardIconContainer}>
-          <MaterialCommunityIcons name={category.icon} size={50} color="#FFF" />
+      <LinearGradient colors={category.gradient} style={[styles.categoryCard, isGridView && styles.categoryCardGrid]}>
+        <View style={[styles.cardIconContainer, isGridView && styles.cardIconContainerGrid]}>
+          <MaterialCommunityIcons name={category.icon} size={isGridView ? 40 : 50} color="#FFF" />
         </View>
         <View style={styles.cardTextContainer}>
-          <Text style={styles.categoryTitle}>{category.title}</Text>
-          <Text style={styles.categoryDesc}>{category.description}</Text>
+          <Text style={[styles.categoryTitle, isGridView && styles.categoryTitleGrid]} numberOfLines={isGridView ? 2 : 1}>{category.title}</Text>
+          {!isGridView && (
+            <Text style={styles.categoryDesc}>{category.description}</Text>
+          )}
         </View>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#FFF" />
+        {!isGridView && (
+          <MaterialCommunityIcons name="chevron-right" size={24} color="#FFF" />
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );
 
   return (
     <LinearGradient
-      colors={["#1F1F1F", "#2A2A2A"]}
+      colors={["#0F2027", "#203A43", "#2C5364"]}
       style={[styles.container, { paddingTop: Math.max(insets.top, 20) }]}
     >
       {/* Header */}
@@ -157,7 +162,12 @@ export default function QuestionWarehouseScreen({ navigation }) {
           <MaterialCommunityIcons name="chevron-left" size={28} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Gudang Soal</Text>
-        <View style={{ width: 40 }} />
+        <TouchableOpacity
+          onPress={() => setIsGridView(!isGridView)}
+          style={styles.toggleButton}
+        >
+          <MaterialCommunityIcons name={isGridView ? "view-list" : "view-grid"} size={26} color="#FFD700" />
+        </TouchableOpacity>
       </View>
 
       {/* Content */}
@@ -172,7 +182,7 @@ export default function QuestionWarehouseScreen({ navigation }) {
           Pilih kategori soal untuk melatih kemampuan matematikamu:
         </Text>
 
-        <View style={styles.categoriesGrid}>
+        <View style={[styles.categoriesGrid, isGridView && styles.categoriesGridWrap]}>
           {categories.map((category) => renderCategoryCard(category))}
         </View>
 
@@ -182,7 +192,7 @@ export default function QuestionWarehouseScreen({ navigation }) {
               <MaterialCommunityIcons
                 name="information-outline"
                 size={20}
-                color="#FF6B6B"
+                color="#FFD700"
                 style={styles.infoIcon}
               />
               <Text style={styles.infoText}>
@@ -214,15 +224,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+  },
+  toggleButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: "rgba(212, 175, 55, 0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(212, 175, 55, 0.3)",
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#FFF",
-    textShadowColor: "rgba(0,0,0,0.3)",
+    color: "#FFFFFF",
+    textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
   contentContainer: {
     flex: 1,
@@ -232,7 +254,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   subtitle: {
-    color: "#FFF",
+    color: "rgba(255, 255, 255, 0.7)",
     fontSize: 14,
     fontWeight: "500",
     marginTop: 10,
@@ -243,16 +265,34 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 20,
   },
+  categoriesGridWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
   cardWrapper: {
-    borderRadius: 15,
+    borderRadius: 18,
     overflow: "hidden",
-    elevation: 5,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  cardWrapperGrid: {
+    width: "48%",
+    marginBottom: 12,
   },
   categoryCard: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
-    borderRadius: 15,
+    padding: 16,
+  },
+  categoryCardGrid: {
+    flexDirection: "column",
+    alignItems: "center",
+    padding: 20,
+    minHeight: 140,
   },
   cardIconContainer: {
     width: 60,
@@ -260,26 +300,45 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    marginRight: 12,
+    borderRadius: 15,
+    marginRight: 15,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
+  cardIconContainerGrid: {
+    marginRight: 0,
+    marginBottom: 12,
+    width: 55,
+    height: 55,
+    borderRadius: 14,
   },
   cardTextContainer: {
     flex: 1,
   },
   categoryTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "900",
     color: "#FFF",
     marginBottom: 4,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  categoryTitleGrid: {
+    fontSize: 15,
+    textAlign: "center",
+    marginBottom: 0,
   },
   categoryDesc: {
     fontSize: 12,
-    color: "rgba(255, 255, 255, 0.9)",
+    color: "rgba(255, 255, 255, 0.8)",
   },
   infoCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    borderRadius: 12,
-    elevation: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
   },
   infoRow: {
     flexDirection: "row",
@@ -292,7 +351,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: "#555",
+    color: "rgba(255, 255, 255, 0.8)",
     lineHeight: 20,
   },
 });
