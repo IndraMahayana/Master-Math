@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
@@ -171,39 +171,52 @@ function ProfileStackNavigator() {
 function BottomTabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === "HomeTab") {
-            iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "QuestionTab") {
-            iconName = focused ? "book" : "book-outline";
-          } else if (route.name === "LeaderboardTab") {
-            iconName = focused ? "trophy" : "trophy-outline";
-          } else if (route.name === "ProfileTab") {
-            iconName = focused ? "account" : "account-outline";
-          }
-          return (
-            <MaterialCommunityIcons name={iconName} size={24} color={color} />
-          );
-        },
-        tabBarActiveTintColor: "#FF6B6B",
-        tabBarInactiveTintColor: "#999",
-        tabBarStyle: {
-          backgroundColor: "#fff",
-          borderTopColor: "#ddd",
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginTop: 4,
-        },
-      })}
+      screenOptions={({ route }) => {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+        const hiddenRoutes = [
+          "Gameplay",
+          "Gameplay2",
+          "PracticeProblems",
+          "ChallengeMenu",
+          "ChallengeLeaderboard",
+        ];
+        const display = hiddenRoutes.includes(routeName) ? "none" : "flex";
+
+        return {
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            if (route.name === "HomeTab") {
+              iconName = focused ? "home" : "home-outline";
+            } else if (route.name === "QuestionTab") {
+              iconName = focused ? "book" : "book-outline";
+            } else if (route.name === "LeaderboardTab") {
+              iconName = focused ? "trophy" : "trophy-outline";
+            } else if (route.name === "ProfileTab") {
+              iconName = focused ? "account" : "account-outline";
+            }
+            return (
+              <MaterialCommunityIcons name={iconName} size={24} color={color} />
+            );
+          },
+          tabBarActiveTintColor: "#FFD700",
+          tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+          tabBarStyle: {
+            display: display,
+            backgroundColor: "#0F2027",
+            borderTopColor: "rgba(255,255,255,0.1)",
+            borderTopWidth: 1,
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 8,
+          },
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: "600",
+            marginTop: 4,
+          },
+        };
+      }}
     >
       <Tab.Screen
         name="HomeTab"

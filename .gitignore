@@ -69,5 +69,5 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
-firebaseConfig.json
+firebaseConfig.js
 node_modules/
