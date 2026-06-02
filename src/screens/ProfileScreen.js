@@ -77,9 +77,15 @@ export default function ProfileScreen({ navigation }) {
   }, [navigation]);
 
   const loadUserData = async () => {
-    if (!auth.currentUser) return;
-
     try {
+      setLoading(true);
+
+      if (!auth.currentUser) {
+        console.log("No current user");
+        setLoading(false);
+        return;
+      }
+
       const userRef = doc(db, "users", auth.currentUser.uid);
       const userSnap = await getDoc(userRef);
 
@@ -89,23 +95,39 @@ export default function ProfileScreen({ navigation }) {
         setNewUsername(data.username || auth.currentUser.email.split("@")[0]);
         setPhotoURL(data.photoURL || null);
         setTotalScore(data.score || 0);
+      } else {
+        console.log("User document does not exist");
       }
 
-      // Load History
-      const historyRef = collection(
-        db,
-        `users/${auth.currentUser.uid}/history`,
-      );
-      const q = query(historyRef, orderBy("date", "desc"), limit(10));
-      const querySnapshot = await getDocs(q);
+      // Load History dari gameHistory collection instead
+      try {
+        const historyRef = collection(db, "gameHistory");
+        const q = query(
+          historyRef,
+          where("uid", "==", auth.currentUser.uid),
+          orderBy("createdAt", "desc"),
+          limit(10),
+        );
+        const querySnapshot = await getDocs(q);
 
-      const historyData = [];
-      querySnapshot.forEach((doc) => {
-        historyData.push({ id: doc.id, ...doc.data() });
-      });
-      setHistory(historyData);
+        const historyData = [];
+        querySnapshot.forEach((doc) => {
+          const gameData = doc.data();
+          historyData.push({
+            id: doc.id,
+            levelTitle: `Level ${gameData.levelId} - ${gameData.mode}`,
+            date: gameData.createdAt?.toDate?.() || new Date(),
+            score: gameData.score || 0,
+          });
+        });
+        setHistory(historyData);
+      } catch (historyError) {
+        console.log("Error loading history:", historyError);
+        setHistory([]);
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error loading user data:", error);
+      Alert.alert("Error", "Gagal memuat data profil: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -200,7 +222,10 @@ export default function ProfileScreen({ navigation }) {
   }
 
   return (
-    <LinearGradient colors={["#0F2027", "#203A43", "#2C5364"]} style={styles.container}>
+    <LinearGradient
+      colors={["#0F2027", "#203A43", "#2C5364"]}
+      style={styles.container}
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
@@ -240,7 +265,12 @@ export default function ProfileScreen({ navigation }) {
               style={styles.input}
               activeOutlineColor="#FFD700"
               textColor="#FFF"
-              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
+              theme={{
+                colors: {
+                  background: "rgba(255,255,255,0.05)",
+                  onSurfaceVariant: "rgba(255,255,255,0.5)",
+                },
+              }}
               right={
                 <TextInput.Icon
                   icon="account-edit"
@@ -273,7 +303,12 @@ export default function ProfileScreen({ navigation }) {
               style={styles.input}
               activeOutlineColor="#FFD700"
               textColor="#FFF"
-              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
+              theme={{
+                colors: {
+                  background: "rgba(255,255,255,0.05)",
+                  onSurfaceVariant: "rgba(255,255,255,0.5)",
+                },
+              }}
             />
             <TextInput
               label="Password Baru"
@@ -284,7 +319,12 @@ export default function ProfileScreen({ navigation }) {
               style={styles.input}
               activeOutlineColor="#FFD700"
               textColor="#FFF"
-              theme={{ colors: { background: "rgba(255,255,255,0.05)", onSurfaceVariant: "rgba(255,255,255,0.5)" } }}
+              theme={{
+                colors: {
+                  background: "rgba(255,255,255,0.05)",
+                  onSurfaceVariant: "rgba(255,255,255,0.5)",
+                },
+              }}
             />
             <Button
               mode="contained"
@@ -338,7 +378,10 @@ export default function ProfileScreen({ navigation }) {
             <Button
               mode="contained"
               onPress={handleLogout}
-              style={[styles.actionButton, { backgroundColor: "rgba(255, 65, 108, 0.8)" }]}
+              style={[
+                styles.actionButton,
+                { backgroundColor: "rgba(255, 65, 108, 0.8)" },
+              ]}
               textColor="#FFF"
             >
               Keluar (Logout)

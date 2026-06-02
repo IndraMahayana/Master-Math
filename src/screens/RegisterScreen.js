@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   StyleSheet,
@@ -11,15 +11,16 @@ import {
 } from "react-native";
 import { Text, TextInput, Button, Title } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithCredential,
-} from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   getResponsiveFontSize,
@@ -28,9 +29,6 @@ import {
   getDeviceType,
   getResponsiveElevation,
 } from "../utils/responsiveUtils";
-import { authStorage } from "../utils/authStorage";
-
-WebBrowser.maybeCompleteAuthSession();
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -38,6 +36,7 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const deviceType = getDeviceType();
 
   // Responsive styles
@@ -54,127 +53,118 @@ export default function RegisterScreen({ navigation }) {
     [deviceType],
   );
 
-  // [PLACEHOLDER] SILAKAN GANTI DENGAN CLIENT ID MILIK ANDA DARI GOOGLE CLOUD CONSOLE
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: "PLACEHOLDER_WEB_CLIENT_ID",
-    androidClientId: "PLACEHOLDER_ANDROID_CLIENT_ID",
-    iosClientId: "PLACEHOLDER_IOS_CLIENT_ID",
-  });
-
-  useEffect(() => {
-    if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-
-      setLoading(true);
-      signInWithCredential(auth, credential)
-        .then(async (result) => {
-          const user = result.user;
-          // Cek apakah user sudah punya data document, jika belum buatkan
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (!userDoc.exists()) {
-            await setDoc(doc(db, "users", user.uid), {
-              username: user.displayName || user.email.split("@")[0],
-              email: user.email,
-              score: 0,
-              createdAt: new Date(),
-            });
-          }
-          setLoading(false);
-          // Redirect ke tab utama setelah sukses
-          const userData = userDoc?.data() || {
-            username: user.displayName || user.email.split("@")[0],
-            score: 0,
-          };
-
-          // Simpan auth state
-          await authStorage.saveAuthState({
-            uid: user.uid,
-            email: user.email,
-            username: userData.username,
-            score: userData.score,
-          });
-
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: "AppTabs",
-                params: {
-                  playerName: userData.username,
-                  score: userData.score,
-                },
-              },
-            ],
-          });
-        })
-        .catch((error) => {
-          setLoading(false);
-          Alert.alert(
-            "Gagal",
-            "Terjadi kesalahan saat otentikasi Google: " + error.message,
-          );
-        });
-    } else if (response?.type === "error" || response?.type === "dismiss") {
-      Alert.alert(
-        "Peringatan",
-        "Proses Registrasi Google dibatalkan atau bermasalah.",
-      );
-    }
-  }, [response]);
-
   const getErrorMessage = (errorCode) => {
     switch (errorCode) {
       case "auth/email-already-in-use":
-        return "Email ini sudah terdaftar!";
+        return "Email ini sudah terdaftar di Firebase Auth! Silakan gunakan email lain atau login.";
       case "auth/invalid-email":
-        return "Format email tidak valid!";
+        return "Format email tidak valid! Contoh: user@example.com";
       case "auth/weak-password":
-        return "Password terlalu lemah (minimal 6 karakter).";
+        return "Password terlalu lemah. Minimal 6 karakter dengan campuran huruf dan angka.";
       case "auth/operation-not-allowed":
-        return "Gagal: Fitur Sign In Email/Password belum diaktifkan di Firebase Console Anda!";
+        return "Fitur registrasi email/password belum diaktifkan di Firebase Console!";
+      case "auth/too-many-requests":
+        return "Terlalu banyak percobaan. Coba lagi nanti.";
       default:
-        return "Terjadi kesalahan. Silakan coba lagi.";
+        return "Terjadi kesalahan: " + errorCode;
     }
   };
 
   const handleRegister = async () => {
+    setErrorMessage(""); // Clear previous errors
+
     if (!username.trim() || !email.trim() || !password.trim()) {
-      Alert.alert("Peringatan", "Semua kolom wajib diisi!");
+      setErrorMessage("❌ Semua kolom wajib diisi!");
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("❌ Password minimal 6 karakter!");
       return;
     }
 
     setLoading(true);
     try {
+      // ✅ Cek apakah username sudah terdaftar
+      const usersRef = collection(db, "users");
+      const usernameQuery = query(
+        usersRef,
+        where("username", "==", username.trim()),
+      );
+      const usernameSnapshot = await getDocs(usernameQuery);
+
+      if (!usernameSnapshot.empty) {
+        setErrorMessage(
+          `❌ Username "${username}" sudah digunakan orang lain. Gunakan username lain.`,
+        );
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Cek apakah email sudah terdaftar
+      const emailQuery = query(
+        usersRef,
+        where("email", "==", email.trim().toLowerCase()),
+      );
+      const emailSnapshot = await getDocs(emailQuery);
+
+      if (!emailSnapshot.empty) {
+        setErrorMessage(
+          `❌ Email "${email}" sudah terdaftar. Gunakan email lain atau login.`,
+        );
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Buat akun baru
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        email,
+        email.trim(),
         password,
       );
       const user = userCredential.user;
 
+      // ✅ Simpan data user ke Firestore
       await setDoc(doc(db, "users", user.uid), {
-        username: username,
-        email: email,
-        score: 0,
-        createdAt: new Date(),
-      });
-
-      // Simpan auth state
-      await authStorage.saveAuthState({
         uid: user.uid,
-        email: email,
-        username: username,
+        username: username.trim(),
+        email: email.trim().toLowerCase(),
         score: 0,
+        level: 1,
+        completedLevels: [],
+        completedChallenges: [],
+        photoURL: "",
+        createdAt: new Date(),
+        lastLoginDate: new Date().toISOString(),
+        totalCoins: 0,
+        achievements: [],
+        stats: {
+          totalGamesPlayed: 0,
+          totalCorrect: 0,
+          totalWrong: 0,
+          averageAccuracy: 0,
+          bestStreak: 0,
+        },
       });
 
-      // Tujuan Point 2: Setelah register berhasil langsung redirect ke menu login
-      Alert.alert("Sukses", "Akun berhasil dibuat!", [
-        { text: "Masuk Sekarang", onPress: () => navigation.replace("Login") },
-      ]);
+      // ✅ JANGAN simpan auth state - user harus login manual
+      // Logout user agar harus login
+      await auth.signOut();
+
+      // ✅ Redirect ke Login dengan pesan sukses
+      Alert.alert(
+        "✅ Registrasi Berhasil!",
+        `Akun "${username}" telah dibuat.\n\nSilakan login dengan email dan password Anda.`,
+        [
+          {
+            text: "Masuk Sekarang",
+            onPress: () => navigation.replace("Login"),
+          },
+        ],
+      );
     } catch (error) {
-      console.error(error);
-      Alert.alert("Gagal Mendaftar", getErrorMessage(error.code));
+      console.error("Register error:", error);
+      setErrorMessage(`❌ ${getErrorMessage(error.code)}`);
     } finally {
       setLoading(false);
     }
@@ -290,23 +280,9 @@ export default function RegisterScreen({ navigation }) {
               Daftar dengan Email
             </Button>
 
-            <Text style={styles.divider}>ATAU</Text>
-
-            <Button
-              mode="outlined"
-              icon="google"
-              onPress={() => promptAsync()}
-              style={[
-                styles.button,
-                styles.googleButton,
-                { marginTop: responsiveStyles.buttonMargin },
-              ]}
-              contentStyle={styles.buttonContent}
-              textColor="#D32F2F"
-              disabled={!request || loading}
-            >
-              Daftar dengan Google
-            </Button>
+            {errorMessage ? (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            ) : null}
 
             <TouchableOpacity
               onPress={() => navigation.navigate("Login")}
@@ -384,6 +360,13 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     color: "#757575",
     fontWeight: "bold",
+  },
+  errorMessage: {
+    color: "#D32F2F",
+    textAlign: "center",
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: "500",
   },
   linkContainer: {
     marginTop: 25,
