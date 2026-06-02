@@ -79,12 +79,15 @@ export default function ProfileScreen({ navigation }) {
   const loadUserData = async () => {
     try {
       setLoading(true);
+      console.log("📱 Loading user data...");
 
       if (!auth.currentUser) {
-        console.log("No current user");
+        console.log("❌ No current user");
         setLoading(false);
         return;
       }
+
+      console.log("👤 Current User UID:", auth.currentUser.uid);
 
       const userRef = doc(db, "users", auth.currentUser.uid);
       const userSnap = await getDoc(userRef);
@@ -110,19 +113,35 @@ export default function ProfileScreen({ navigation }) {
         );
         const querySnapshot = await getDocs(q);
 
+        console.log("📊 Game History Query Result:", {
+          totalDocs: querySnapshot.size,
+          uid: auth.currentUser.uid,
+        });
+
         const historyData = [];
         querySnapshot.forEach((doc) => {
           const gameData = doc.data();
+          console.log("📄 Game Doc:", gameData);
+
           historyData.push({
             id: doc.id,
-            levelTitle: `Level ${gameData.levelId} - ${gameData.mode}`,
-            date: gameData.createdAt?.toDate?.() || new Date(),
+            levelTitle: `Level ${gameData.levelId} - ${gameData.mode || "unknown"}`,
+            date:
+              gameData.createdAt?.toDate?.() ||
+              new Date(gameData.createdAt) ||
+              new Date(),
             score: gameData.score || 0,
           });
         });
+
+        console.log("✅ History Data Loaded:", historyData.length, "items");
         setHistory(historyData);
       } catch (historyError) {
-        console.log("Error loading history:", historyError);
+        console.error("❌ Error loading history:", historyError);
+        console.error("Error details:", {
+          message: historyError.message,
+          code: historyError.code,
+        });
         setHistory([]);
       }
     } catch (error) {

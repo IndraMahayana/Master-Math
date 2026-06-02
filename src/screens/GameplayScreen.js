@@ -238,12 +238,25 @@ export default function GameplayScreen({ route, navigation }) {
 
         await setDoc(userRef, updates, { merge: true });
 
-        await addDoc(collection(userRef, "history"), {
-          levelId,
+        // ✅ Simpan ke gameHistory collection (bukan subcollection)
+        const gameHistoryDoc = await addDoc(collection(db, "gameHistory"), {
+          uid: auth.currentUser.uid,
+          levelId: String(levelId),
           levelTitle,
+          mode: gameMode,
           score: bonusScore,
           streak: highestStreak,
-          date: new Date().toISOString(),
+          isPerfect,
+          createdAt: new Date(),
+        });
+
+        console.log("✅ Game saved to gameHistory:", {
+          docId: gameHistoryDoc.id,
+          uid: auth.currentUser.uid,
+          levelId,
+          score: bonusScore,
+          mode: gameMode,
+          timestamp: new Date().toISOString(),
         });
 
         // Update level-specific leaderboard
@@ -253,7 +266,9 @@ export default function GameplayScreen({ route, navigation }) {
           username: currentUsername,
         });
       } catch (error) {
-        console.error("Error saving score:", error);
+        console.error("❌ Error saving score:", error);
+        console.error("Error stack:", error.stack);
+        Alert.alert("Error", "Gagal menyimpan skor: " + error.message);
       }
     },
     [levelId, levelTitle, isPerfect, highestStreak],
