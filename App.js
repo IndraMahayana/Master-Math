@@ -7,6 +7,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { View, Text, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { authStorage } from "./src/utils/authStorage";
+import { setupFirestore } from "./src/setupFirestore";
 
 // Import Screens
 import LoginScreen from "./src/screens/LoginScreen";
@@ -272,6 +273,7 @@ export default function App() {
     };
 
     checkAuthState();
+    setupFirestore();
   }, []);
 
   if (isLoading) {
