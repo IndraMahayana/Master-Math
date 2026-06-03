@@ -24,6 +24,12 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Challenge Leaderboards - Semua bisa baca, hanya user terauth bisa write
+    match /challenge_leaderboards/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     // Challenges - Semua bisa baca
     match /challenges/{document=**} {
       allow read: if true;
@@ -33,7 +39,8 @@ service cloud.firestore {
     // Game History - Authenticated user bisa read/write
     match /gameHistory/{gameId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.uid;
     }
 
     // Challenge Attempts

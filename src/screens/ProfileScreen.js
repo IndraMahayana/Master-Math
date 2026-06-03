@@ -125,7 +125,7 @@ export default function ProfileScreen({ navigation }) {
 
           historyData.push({
             id: doc.id,
-            levelTitle: `Level ${gameData.levelId} - ${gameData.mode || "unknown"}`,
+            levelTitle: gameData.levelTitle || `Level ${gameData.levelId} - ${gameData.mode || "unknown"}`,
             date:
               gameData.createdAt?.toDate?.() ||
               new Date(gameData.createdAt) ||

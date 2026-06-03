@@ -13,6 +13,7 @@ import {
   ScrollView,
   Text,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -187,35 +188,80 @@ export default function GameplayScreen({ route, navigation }) {
 
         // Jika ini mode challenge, simpan skor ke database challenge khusus
         if (gameMode === "daily_challenge" || gameMode === "weekly_challenge") {
-          const challengeType =
-            gameMode === "daily_challenge" ? "daily" : "weekly";
-          const challengeRef = doc(
-            db,
-            `challenge_leaderboards/${challengeType}/users`,
-            auth.currentUser.uid,
-          );
-          const challengeSnap = await getDoc(challengeRef);
-
-          let chScore = bonusScore;
-          let chStreak = highestStreak;
-          if (challengeSnap.exists()) {
-            const chData = challengeSnap.data();
-            if (chData.score && chData.score > bonusScore)
-              chScore = chData.score;
-            if (chData.streak && chData.streak > highestStreak)
-              chStreak = chData.streak;
+          // 1. Update skor akumulasi global pemain (users/{uid})
+          try {
+            await setDoc(
+              userRef,
+              {
+                score: newTotalScore,
+                lastPlayed: new Date(),
+              },
+              { merge: true },
+            );
+            console.log("✅ Total score updated successfully for challenge mode.");
+          } catch (err) {
+            console.error("❌ Failed to update total score in challenge mode:", err);
           }
 
-          await setDoc(
-            challengeRef,
-            {
-              score: chScore,
-              streak: chStreak,
-              username: currentUsername,
-              date: new Date().toISOString(),
-            },
-            { merge: true },
-          );
+          // 2. Simpan ke gameHistory collection
+          try {
+            const historyScore = bonusScore;
+            const gameHistoryDoc = await addDoc(collection(db, "gameHistory"), {
+              uid: auth.currentUser.uid,
+              levelId: String(levelId),
+              levelTitle: gameMode === "daily_challenge" ? "Tantangan Harian" : "Tantangan Mingguan",
+              mode: gameMode,
+              score: historyScore,
+              streak: highestStreak,
+              isPerfect,
+              createdAt: new Date(),
+            });
+
+            console.log("✅ Challenge saved to gameHistory:", {
+              docId: gameHistoryDoc.id,
+              uid: auth.currentUser.uid,
+              score: historyScore,
+              mode: gameMode,
+            });
+          } catch (err) {
+            console.error("❌ Failed to save challenge to gameHistory:", err);
+          }
+
+          // 3. Simpan ke leaderboard tantangan harian/mingguan
+          try {
+            const challengeType =
+              gameMode === "daily_challenge" ? "daily" : "weekly";
+            const challengeRef = doc(
+              db,
+              `challenge_leaderboards/${challengeType}/users`,
+              auth.currentUser.uid,
+            );
+            const challengeSnap = await getDoc(challengeRef);
+
+            let chScore = bonusScore;
+            let chStreak = highestStreak;
+            if (challengeSnap.exists()) {
+              const chData = challengeSnap.data();
+              if (chData.score && chData.score > bonusScore)
+                chScore = chData.score;
+              if (chData.streak && chData.streak > highestStreak)
+                chStreak = chData.streak;
+            }
+
+            await setDoc(
+              challengeRef,
+              {
+                score: chScore,
+                streak: chStreak,
+                username: currentUsername,
+                date: new Date().toISOString(),
+              },
+              { merge: true },
+            );
+            console.log("✅ Challenge leaderboard updated successfully.");
+          } catch (err) {
+            console.error("❌ Failed to update challenge leaderboard:", err);
+          }
 
           return; // Jangan simpan ke skor utama dan history level
         }
@@ -239,24 +285,28 @@ export default function GameplayScreen({ route, navigation }) {
         await setDoc(userRef, updates, { merge: true });
 
         // ✅ Simpan ke gameHistory collection (bukan subcollection)
+        // Mode lives harus selalu save, bahkan jika score = 0 atau finalScore kecil
+        const historyScore = gameMode === "lives" ? Math.max(bonusScore, finalScore) : bonusScore;
         const gameHistoryDoc = await addDoc(collection(db, "gameHistory"), {
           uid: auth.currentUser.uid,
           levelId: String(levelId),
           levelTitle,
           mode: gameMode,
-          score: bonusScore,
+          score: historyScore,
           streak: highestStreak,
           isPerfect,
           createdAt: new Date(),
         });
-
+        
         console.log("✅ Game saved to gameHistory:", {
           docId: gameHistoryDoc.id,
           uid: auth.currentUser.uid,
           levelId,
-          score: bonusScore,
+          score: historyScore,
           mode: gameMode,
-          timestamp: new Date().toISOString(),
+          originalScore: finalScore,
+          bonusScore,
+          makePerfect: isPerfect,
         });
 
         // Update level-specific leaderboard
@@ -271,7 +321,7 @@ export default function GameplayScreen({ route, navigation }) {
         Alert.alert("Error", "Gagal menyimpan skor: " + error.message);
       }
     },
-    [levelId, levelTitle, isPerfect, highestStreak],
+    [levelId, levelTitle, isPerfect, highestStreak, gameMode],
   );
 
   // ─── Game Over ────────────────────────────────────────────────────────────────
@@ -284,7 +334,11 @@ export default function GameplayScreen({ route, navigation }) {
     ) => {
       if (gameOverRef.current) return; // jangan panggil dua kali
       setGameOver(true);
-      await saveScore(finalScore);
+      try {
+        await saveScore(finalScore);
+      } catch (err) {
+        console.error("Error in saveScore inside endGame:", err);
+      }
       let reason = isTimeOut ? "time-up" : "wrong-answer";
       if (
         (gameMode === "lives" ||
@@ -305,7 +359,7 @@ export default function GameplayScreen({ route, navigation }) {
 
   // ─── Timer countdown ──────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!currentQ || gameOver) return;
+    if (!currentQ || gameOver || gameOverRef.current) return;
 
     if (timeLeft <= 0) {
       if (
@@ -315,10 +369,13 @@ export default function GameplayScreen({ route, navigation }) {
       ) {
         setLives((prev) => {
           const newLives = prev - 1;
+          console.log("⏱️ Time out - Lives remaining:", newLives);
           if (newLives <= 0) {
+            console.log("💀 Out of lives - Game Over");
             endGame(scoreRef.current, true, true);
           } else {
             setCombo(0);
+            setTimeLeft(MAX_TIME); // Reset timer untuk soal berikutnya
             loadQuestion();
           }
           return newLives;
@@ -334,7 +391,7 @@ export default function GameplayScreen({ route, navigation }) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, currentQ, gameOver, endGame, gameMode, loadQuestion]);
+  }, [timeLeft, currentQ, gameOver, endGame, gameMode, loadQuestion, MAX_TIME]);
 
   // ─── Handle jawaban ───────────────────────────────────────────────────────────
   const handleAnswer = useCallback(
@@ -396,9 +453,12 @@ export default function GameplayScreen({ route, navigation }) {
         ) {
           setLives((prev) => {
             const newLives = prev - 1;
+            console.log("❌ Wrong answer - Lives remaining:", newLives);
             if (newLives <= 0) {
+              console.log("💀 Out of lives - Game Over");
               endGame(penalizedScore, false, true);
             } else {
+              setTimeLeft(MAX_TIME); // Reset timer untuk soal berikutnya
               loadQuestion();
             }
             return newLives;
