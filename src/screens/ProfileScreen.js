@@ -131,6 +131,8 @@ export default function ProfileScreen({ navigation }) {
               new Date(gameData.createdAt) ||
               new Date(),
             score: gameData.score || 0,
+            streak: gameData.streak || 0,
+            mode: gameData.mode || "",
           });
         });
 
@@ -239,6 +241,17 @@ export default function ProfileScreen({ navigation }) {
       </LinearGradient>
     );
   }
+
+  const formatMode = (mode) => {
+    switch (mode) {
+      case "sudden_death": return "Sudden Death ☠️";
+      case "lives": return "Mode Nyawa ❤️";
+      case "20_questions": return "20 Soal 🎯";
+      case "daily_challenge": return "Tantangan Harian 📅";
+      case "weekly_challenge": return "Tantangan Mingguan 📆";
+      default: return mode || "Klasik";
+    }
+  };
 
   return (
     <LinearGradient
@@ -367,8 +380,9 @@ export default function ProfileScreen({ navigation }) {
                   key={i}
                   title={game.levelTitle}
                   titleStyle={styles.historyTitle}
-                  description={new Date(game.date).toLocaleString("id-ID")}
+                  description={`Waktu: ${new Date(game.date).toLocaleString("id-ID")}\nMode: ${formatMode(game.mode)} | Streak Maks: ${game.streak} 🔥`}
                   descriptionStyle={styles.historyDesc}
+                  descriptionNumberOfLines={2}
                   right={(props) => (
                     <Text {...props} style={styles.scoreText}>
                       {game.score} Pts

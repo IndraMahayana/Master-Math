@@ -36,6 +36,7 @@ export const isBossLevel = (level) => {
  */
 export const checkPhaseUnlock = (playerProgress) => {
   const completed = playerProgress?.completedLevels || [];
+  const score = playerProgress?.score || 0;
 
   // Hitung jumlah level selesai di tiap Fase
   let phase1Complete = 0; // level 1-15
@@ -47,8 +48,11 @@ export const checkPhaseUnlock = (playerProgress) => {
     if (l >= 16 && l <= 30) phase2Complete++;
   });
 
-  const phase2Unlocked = phase1Complete >= 11; // 70% dari 15
-  const phase3Unlocked = phase2Unlocked && (phase2Complete >= 9); // 60% dari 15
+  // Fase 2 terbuka jika menyelesaikan 70% Fase 1 ATAU skor mencukupi untuk Level 16
+  const phase2Unlocked = (phase1Complete >= 11) || (score >= getRequiredScore(16));
+  
+  // Fase 3 terbuka jika Fase 2 terbuka DAN (menyelesaikan 60% Fase 2 ATAU skor mencukupi untuk Level 31)
+  const phase3Unlocked = phase2Unlocked && ((phase2Complete >= 9) || (score >= getRequiredScore(31)));
 
   return {
     phase1: true, // Always unlocked
